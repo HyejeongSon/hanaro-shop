@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: hanaro
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/hanarodb?serverTimezone=UTC&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    username: hanaro
+    password: 12345678
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+upload:
+  path: D:/upload
+
+logging:
+  level:
+    org.springframework.security.web: trace

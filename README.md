@@ -44,8 +44,8 @@
 | 인증/인가 | Spring Security 기반 인증 (ADMIN vs. USER)<br/>- ADMIN 아이디/비밀번호 → `hanaro/12345678`<br/>- 로그인 시 JWT 발급 후 사용자 인증<br/>- ROLE 기반 접근 제어 (`ROLE_ADMIN`, `ROLE_USER`) |
 | 파일 업로드 | - 원본 위치: `/resources/static/origin`<br/>- 업로드 위치: `/resources/static/upload`<br/>- 업로드된 날짜별 디렉토리 자동 생성<br/>예: 2025년 07월 25일 업로드한 경우 → `/resources/static/upload/2025/07/25`<br/>- 파일명 중복 방지<br/>- 최대 크기: 1개 512KB, 총 3MB 제한 |
 | 스케줄링 | - 결제가 완료되고 → 배송 준비 (매 5분마다 결제 완료된 주문을 배송 준비 상태로)<br/>- 배송 준비 → 배송 중 (매 15분마다 배송 준비 상태를 배송 중 상태로)<br/>- 배송 중 → 배송 완료 (매 1시간마다 배송 중 상태를 배송 완료 상태로) 변환 |
-| 배치 Job | - 매일 자정에 실행<br/>- 일별 매출 통계 저장<br/>- 주문 통계 집계하여 매출액, 주문 수, 상품별 통계 데이터 생성<br/>- 별도의 테이블에 저장 (통계 테이블) |
-| 로그 | - 주요 이벤트 로깅<br/>- console: 표준 콘솔 출력<br/>- 상품 관리 및 주문 관련 비즈니스 로직을 각각 별도의 로그 파일로 출력 (`business_product.log`, `business_order.log`)<br/>- rolling: 일일 단위 파일 롤링<br/>- 프로젝트 내부 `logs` 폴더에 보존 |
+| 배치 Job | 매일 자정에 실행<br/>- 일별 매출 통계 저장<br/>- 주문 통계 집계하여 매출액, 주문 수, 상품별 통계 데이터 생성<br/>- 별도의 테이블에 저장 (통계 테이블) |
+| 로그 | 주요 이벤트 로깅<br/>- console: 표준 콘솔 출력<br/>- 상품 관리 및 주문 관련 비즈니스 로직을 각각 별도의 로그 파일로 출력 (`business_product.log`, `business_order.log`)<br/>- rolling: 일일 단위 파일 롤링<br/>- 프로젝트 내부 `logs` 폴더에 보존 |
 | Swagger (OpenAPI 3) | - 관리자/사용자용 API 명확히 분리 및 문서화<br/>- Swagger UI로 테스트 가능 |
 | Validation | - 회원가입, 상품 등록 시 모든 입력 필드에 유효성 검사 적용 |
 | Actuator | - 시스템 헬스(`health`), 빈(`bean`) 정보, 환경(`env`) 정보, 메트릭(`metric`) 정보 확인용 엔드포인트 제공 |
