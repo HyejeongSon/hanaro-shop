@@ -1,11 +1,13 @@
 spring:
   application:
     name: hanaro
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/hanarodb?serverTimezone=UTC&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-    username: hanaro
-    password: 12345678
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -14,8 +16,16 @@ spring:
         show_sql: true
         format_sql: true
 
+jwt:
+  access:
+    secret: ${JWT_ACCESS_SECRET}
+    expiration: ${JWT_ACCESS_EXPIRATION:3600000}  # 1시간
+  refresh:
+    secret: ${JWT_REFRESH_SECRET}
+    expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7일
+
 upload:
-  path: D:/upload
+  path: ${UPLOAD_PATH}
 
 logging:
   level:
