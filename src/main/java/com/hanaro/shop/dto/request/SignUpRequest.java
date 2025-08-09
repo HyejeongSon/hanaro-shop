@@ -1,5 +1,6 @@
 package com.hanaro.shop.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -19,8 +20,8 @@ public class SignUpRequest {
 
     @NotBlank(message = "비밀번호는 필수입니다")
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다")
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]", 
-             message = "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", 
+             message = "비밀번호는 8자 이상이며 영문, 숫자, 특수문자(@$!%*?&)를 포함해야 합니다")
     private String password;
 
     @NotBlank(message = "비밀번호 확인은 필수입니다")
@@ -41,6 +42,7 @@ public class SignUpRequest {
     private String address;
 
     // 비밀번호 확인 검증
+    @JsonIgnore
     public boolean isPasswordMatched() {
         return password != null && password.equals(confirmPassword);
     }

@@ -7,6 +7,11 @@ import com.hanaro.shop.dto.response.MemberResponse;
 import com.hanaro.shop.dto.response.TokenResponse;
 import com.hanaro.shop.security.CustomUserDetails;
 import com.hanaro.shop.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,40 +21,56 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-//@Tag(name = "Authentication", description = "인증 관련 API")
+@Tag(name = "인증", description = "회원가입, 로그인, 로그아웃, JWT 토큰 관리")
 public class AuthController {
 
     private final AuthService authService;
 
-//    @Operation(summary = "회원가입", description = "새로운 사용자 계정을 생성합니다")
+    @Operation(summary = "회원가입", description = "새로운 사용자 계정을 생성합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원가입 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터")
+    })
     @PostMapping("/signup")
     public ResponseEntity<MemberResponse> signUp(@Valid @RequestBody SignUpRequest request) {
         MemberResponse response = authService.signUp(request);
         return ResponseEntity.ok(response);
     }
 
-//    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 JWT 토큰을 발급받습니다")
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 JWT 토큰을 발급받습니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패")
+    })
     @PostMapping("/signin")
     public ResponseEntity<TokenResponse> signIn(@Valid @RequestBody SignInRequest request) {
         TokenResponse response = authService.signIn(request);
         return ResponseEntity.ok(response);
     }
 
-//    @Operation(summary = "토큰 재발급", description = "리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다")
+    @Operation(summary = "토큰 재발급", description = "리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 리프레시 토큰")
+    })
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         TokenResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(response);
     }
 
-//    @Operation(summary = "로그아웃", description = "현재 사용자를 로그아웃시키고 리프레시 토큰을 삭제합니다")
+    @Operation(summary = "로그아웃", description = "현재 사용자를 로그아웃시키고 리프레시 토큰을 삭제합니다")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @ApiResponse(responseCode = "200", description = "로그아웃 성공")
     @PostMapping("/signout")
     public ResponseEntity<String> signOut(@AuthenticationPrincipal CustomUserDetails userDetails) {
         authService.signOut(userDetails.getMemberId());
         return ResponseEntity.ok("로그아웃이 완료되었습니다");
     }
 
-//    @Operation(summary = "내 정보 조회", description = "현재 로그인한 사용자의 정보를 조회합니다")
+    @Operation(summary = "내 정보 조회", description = "현재 로그인한 사용자의 정보를 조회합니다")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공")
     @GetMapping("/me")
     public ResponseEntity<MemberResponse> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         MemberResponse response = MemberResponse.builder()
