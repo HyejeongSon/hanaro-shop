@@ -1,6 +1,8 @@
 package com.hanaro.shop.service;
 
 import com.hanaro.shop.dto.UploadResultDTO;
+import com.hanaro.shop.exception.BusinessException;
+import com.hanaro.shop.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,7 +103,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         } catch (IOException e) {
             log.error("Failed to upload file: {}", file.getOriginalFilename(), e);
-            throw new RuntimeException("파일 업로드에 실패했습니다: " + e.getMessage(), e);
+            throw new BusinessException(ErrorCode.FILE_UPLOAD_ERROR);
         }
     }
 
@@ -136,38 +138,38 @@ public class FileUploadServiceImpl implements FileUploadService {
             
         } catch (IOException e) {
             log.error("Failed to delete file: {}", fileName, e);
-            throw new RuntimeException("파일 삭제에 실패했습니다: " + e.getMessage(), e);
+            throw new BusinessException(ErrorCode.FILE_UPLOAD_ERROR);
         }
     }
 
     @Override
     public void validateImageFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("파일이 비어있습니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
         }
 
         // Content-Type 검증
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
-            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. (jpg, png, gif만 허용)");
+            throw new BusinessException(ErrorCode.INVALID_FILE_TYPE);
         }
 
         // 파일 확장자 검증
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.trim().isEmpty()) {
-            throw new IllegalArgumentException("파일명이 올바르지 않습니다.");
+            throw new BusinessException(ErrorCode.INVALID_INPUT);
         }
 
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new IllegalArgumentException("허용되지 않는 파일 확장자입니다. (jpg, png, gif만 허용)");
+            throw new BusinessException(ErrorCode.INVALID_FILE_TYPE);
         }
     }
 
     @Override
     public void validateFileSize(MultipartFile file) {
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("파일 크기는 512KB를 초과할 수 없습니다.");
+            throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED);
         }
     }
 
@@ -175,7 +177,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     public void validateTotalFileSize(List<MultipartFile> files) {
         long totalSize = files.stream().mapToLong(MultipartFile::getSize).sum();
         if (totalSize > MAX_TOTAL_SIZE) {
-            throw new IllegalArgumentException("전체 파일 크기는 3MB를 초과할 수 없습니다.");
+            throw new BusinessException(ErrorCode.FILE_SIZE_EXCEEDED);
         }
     }
 

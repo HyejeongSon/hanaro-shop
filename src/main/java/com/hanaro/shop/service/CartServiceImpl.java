@@ -7,12 +7,13 @@ import com.hanaro.shop.domain.Product;
 import com.hanaro.shop.dto.request.CartItemRequest;
 import com.hanaro.shop.dto.response.CartResponse;
 import com.hanaro.shop.dto.response.CartSummaryResponse;
+import com.hanaro.shop.exception.BusinessException;
+import com.hanaro.shop.exception.ErrorCode;
 import com.hanaro.shop.mapper.CartMapper;
 import com.hanaro.shop.repository.CartItemRepository;
 import com.hanaro.shop.repository.CartRepository;
 import com.hanaro.shop.repository.MemberRepository;
 import com.hanaro.shop.repository.ProductRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class CartServiceImpl implements CartService {
         Product product = getProductById(request.getProductId());
 
         if (product.getStockQuantity() < request.getQuantity()) {
-            throw new IllegalArgumentException("재고가 부족합니다. 현재 재고: " + product.getStockQuantity());
+            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
         Optional<CartItem> existingItem = cartItemRepository.findByCartAndProduct(cart, product);
@@ -57,7 +58,7 @@ public class CartServiceImpl implements CartService {
             int newQuantity = cartItem.getQuantity() + request.getQuantity();
             
             if (product.getStockQuantity() < newQuantity) {
-                throw new IllegalArgumentException("재고가 부족합니다. 현재 재고: " + product.getStockQuantity());
+                throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
             }
             
             cartItem.updateQuantity(newQuantity);
@@ -87,11 +88,11 @@ public class CartServiceImpl implements CartService {
         Product product = getProductById(productId);
 
         if (product.getStockQuantity() < quantity) {
-            throw new IllegalArgumentException("재고가 부족합니다. 현재 재고: " + product.getStockQuantity());
+            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
         CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new EntityNotFoundException("장바구니에 해당 상품이 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         cartItem.updateQuantity(quantity);
         cartItem.updateUnitPrice();
@@ -108,7 +109,7 @@ public class CartServiceImpl implements CartService {
         Product product = getProductById(productId);
 
         CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new EntityNotFoundException("장바구니에 해당 상품이 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         cart.removeItem(cartItem);
         cartItemRepository.delete(cartItem);
@@ -170,19 +171,19 @@ public class CartServiceImpl implements CartService {
                 memberId, productId, amount);
 
         if (amount <= 0) {
-            throw new IllegalArgumentException("증가량은 0보다 커야 합니다");
+            throw new BusinessException(ErrorCode.INVALID_QUANTITY);
         }
 
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
         CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new EntityNotFoundException("장바구니에 해당 상품이 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         int newQuantity = cartItem.getQuantity() + amount;
         
         if (product.getStockQuantity() < newQuantity) {
-            throw new IllegalArgumentException("재고가 부족합니다. 현재 재고: " + product.getStockQuantity());
+            throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
         cartItem.updateQuantity(newQuantity);
@@ -198,14 +199,14 @@ public class CartServiceImpl implements CartService {
                 memberId, productId, amount);
 
         if (amount <= 0) {
-            throw new IllegalArgumentException("감소량은 0보다 커야 합니다");
+            throw new BusinessException(ErrorCode.INVALID_QUANTITY);
         }
 
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
         CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new EntityNotFoundException("장바구니에 해당 상품이 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         int newQuantity = cartItem.getQuantity() - amount;
         
@@ -237,16 +238,16 @@ public class CartServiceImpl implements CartService {
 
     private Cart getCartByMemberIdOrThrow(Long memberId) {
         return cartRepository.findByMemberIdWithItems(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("장바구니를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
     }
 
     private Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다: " + memberId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private Product getProductById(Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다: " + productId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 }

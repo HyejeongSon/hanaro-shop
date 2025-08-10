@@ -8,10 +8,11 @@ import com.hanaro.shop.dto.request.SignUpRequest;
 import com.hanaro.shop.dto.request.TokenRefreshRequest;
 import com.hanaro.shop.dto.response.MemberResponse;
 import com.hanaro.shop.dto.response.TokenResponse;
+import com.hanaro.shop.exception.BusinessException;
+import com.hanaro.shop.exception.ErrorCode;
 import com.hanaro.shop.repository.MemberRepository;
 import com.hanaro.shop.repository.RefreshTokenRepository;
 import com.hanaro.shop.security.JwtTokenProvider;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,12 +42,12 @@ public class AuthServiceImpl implements AuthService {
     public MemberResponse signUp(SignUpRequest request) {
         // 비밀번호 확인 검증
         if (!request.isPasswordMatched()) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 
         // 이메일 중복 검사
         if (memberRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다");
+            throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
 
@@ -78,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
 
             // 2. 인증된 사용자 정보 조회
             Member member = memberRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new BadCredentialsException("이메일 또는 비밀번호가 올바르지 않습니다"));
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_PASSWORD));
 
             // 3. JWT 토큰 생성
             String accessToken = jwtTokenProvider.generateAccessToken(
@@ -105,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
 
         } catch (BadCredentialsException e) {
             log.warn("로그인 실패: {}", request.getEmail());
-            throw new BadCredentialsException("이메일 또는 비밀번호가 올바르지 않습니다");
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
     }
 
@@ -116,20 +117,20 @@ public class AuthServiceImpl implements AuthService {
 
         // 1. 리프레시 토큰 검증
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         // 2. 토큰에서 회원 ID 추출
         Long memberId = jwtTokenProvider.getMemberIdFromRefreshToken(refreshToken);
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 3. DB에 저장된 리프레시 토큰과 비교
         RefreshToken storedToken = refreshTokenRepository.findByMember(member)
-                .orElseThrow(() -> new IllegalArgumentException("리프레시 토큰이 존재하지 않습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_TOKEN));
 
         if (!storedToken.getToken().equals(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         // 4. 새로운 액세스 토큰 발급
@@ -152,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void signOut(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         // DB에서 리프레시 토큰 삭제
         refreshTokenRepository.findByMember(member)
