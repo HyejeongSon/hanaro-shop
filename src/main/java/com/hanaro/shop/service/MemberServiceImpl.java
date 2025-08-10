@@ -2,6 +2,8 @@ package com.hanaro.shop.service;
 
 import com.hanaro.shop.domain.Member;
 import com.hanaro.shop.dto.response.MemberResponse;
+import com.hanaro.shop.exception.BusinessException;
+import com.hanaro.shop.exception.ErrorCode;
 import com.hanaro.shop.repository.MemberRepository;
 import com.hanaro.shop.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberResponse getMemberById(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + memberId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         
         return MemberResponse.from(member);
     }
@@ -33,7 +35,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberResponse getMemberByEmail(String email) {
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + email));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         
         return MemberResponse.from(member);
     }
@@ -48,7 +50,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberResponse updateMember(Long memberId, String name, String nickname, String phone, String address) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + memberId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         member.updateProfile(name, nickname, phone, address);
         Member updatedMember = memberRepository.save(member);
@@ -61,11 +63,11 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void changePassword(Long memberId, String currentPassword, String newPassword) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + memberId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 현재 비밀번호 확인
         if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 올바르지 않습니다");
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
 
         // 새 비밀번호로 변경
@@ -80,7 +82,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void deleteMember(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + memberId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 1. 리프레시 토큰 삭제
         refreshTokenRepository.findByMember(member)

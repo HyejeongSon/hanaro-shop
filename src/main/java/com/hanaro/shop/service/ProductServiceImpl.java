@@ -5,6 +5,8 @@ import com.hanaro.shop.domain.ProductCategory;
 import com.hanaro.shop.dto.UploadResultDTO;
 import com.hanaro.shop.dto.request.ProductRequest;
 import com.hanaro.shop.dto.response.ProductResponse;
+import com.hanaro.shop.exception.BusinessException;
+import com.hanaro.shop.exception.ErrorCode;
 import com.hanaro.shop.mapper.ProductMapper;
 import com.hanaro.shop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -105,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Updating product: id={}", productId);
         
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         productMapper.updateEntity(product, request);
         
@@ -168,7 +170,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Updating stock quantity: productId={}, quantity={}", productId, quantity);
         
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         product.updateStockQuantity(quantity);
         
@@ -183,7 +185,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Deleting product: id={}", productId);
         
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         // 1. 먼저 연관된 물리 파일들 삭제
         product.getImages().forEach(image -> {
@@ -205,7 +207,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Updating product status: productId={}, active={}", productId, active);
         
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         if (active) {
             product.activate();

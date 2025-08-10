@@ -1,5 +1,6 @@
 package com.hanaro.shop.security;
 
+import com.hanaro.shop.exception.CustomJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -82,25 +83,35 @@ public class JwtTokenProvider {
 
     // 액세스 토큰에서 memberId 추출
     public Long getMemberIdFromAccessToken(String token) {
-        return Long.parseLong(
-                Jwts.parserBuilder()
-                        .setSigningKey(accessKey)
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody()
-                        .getSubject()
-        );
+        try {
+            return Long.parseLong(
+                    Jwts.parserBuilder()
+                            .setSigningKey(accessKey)
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody()
+                            .getSubject()
+            );
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("액세스 토큰에서 회원 ID 추출 실패: {}", e.getMessage());
+            throw new CustomJwtException("유효하지 않은 토큰입니다");
+        }
     }
 
     // 액세스 토큰에서 roles 추출
     @SuppressWarnings("unchecked")
     public List<String> getRolesFromAccessToken(String token) {
-        return (List<String>) Jwts.parserBuilder()
-                .setSigningKey(accessKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("roles");
+        try {
+            return (List<String>) Jwts.parserBuilder()
+                    .setSigningKey(accessKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("roles");
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("액세스 토큰에서 권한 추출 실패: {}", e.getMessage());
+            throw new CustomJwtException("유효하지 않은 토큰입니다");
+        }
     }
 
     // 리프레시 토큰 검증
@@ -119,13 +130,18 @@ public class JwtTokenProvider {
 
     // 리프레시 토큰에서 memberId 추출
     public Long getMemberIdFromRefreshToken(String token) {
-        return Long.parseLong(
-                Jwts.parserBuilder()
-                        .setSigningKey(refreshKey)
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody()
-                        .getSubject()
-        );
+        try {
+            return Long.parseLong(
+                    Jwts.parserBuilder()
+                            .setSigningKey(refreshKey)
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody()
+                            .getSubject()
+            );
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("리프레시 토큰에서 회원 ID 추출 실패: {}", e.getMessage());
+            throw new CustomJwtException("유효하지 않은 리프레시 토큰입니다");
+        }
     }
 }
