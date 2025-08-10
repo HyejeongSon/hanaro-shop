@@ -95,4 +95,20 @@ public class Product {
     public void activate() {
         this.isActive = true;
     }
+
+    public void addImage(ProductImage image) {
+        this.images.add(image);
+        image.setProduct(this);
+    }
+
+    public ProductImage getMainImage() {
+        return this.images.stream()
+                .filter(ProductImage::getIsMainImage)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void clearImages() {
+        this.images.clear();
+    }
 }

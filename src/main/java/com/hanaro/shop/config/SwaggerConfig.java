@@ -41,20 +41,6 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi authApi() {
-        return GroupedOpenApi.builder()
-                .group("인증 API")
-                .displayName("Auth API")
-                .pathsToMatch("/api/auth/**")
-                .addOpenApiCustomizer(openApi -> openApi
-                        .info(new Info()
-                                .title("Hanaro Shop - Auth API")
-                                .description("회원가입, 로그인, 토큰 관리")
-                                .version("v1.0.0")))
-                .build();
-    }
-
-    @Bean
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
                 .group("관리자 API")
@@ -87,10 +73,11 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("공통 API")
                 .displayName("Public API")
+                .pathsToMatch("/api/auth/**", "/api/member/**", "/api/product/**")
                 .addOpenApiCustomizer(openApi -> openApi
                         .info(new Info()
                                 .title("Hanaro Shop - Public API")
-                                .description("공통 API")
+                                .description("공통 API (인증, 상품 조회, 개인정보 관리)")
                                 .version("v1.0.0")))
                 .build();
     }
