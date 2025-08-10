@@ -59,6 +59,7 @@ public class SecurityConfig {
                     "/v3/api-docs/**",       // OpenAPI 문서
                     "/swagger-resources/**", 
                     "/webjars/**",
+                    "/upload/**",
                     "/management/**",        // Actuator
                     "/error"                 // 에러 페이지
                 ).permitAll()

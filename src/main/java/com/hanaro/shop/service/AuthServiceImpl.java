@@ -163,7 +163,7 @@ public class AuthServiceImpl implements AuthService {
 
     // 관리자 계정 초기화 (애플리케이션 시작 시 실행)
     @Override
-    @PostConstruct
+    // @PostConstruct
     @Transactional
     public void initializeAdminAccount() {
         if (!memberRepository.existsByEmail("hanaro@hanaro.com")) {
