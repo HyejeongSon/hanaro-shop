@@ -30,8 +30,6 @@ public class ProductImageResponse {
     @Schema(description = "이미지 URL", example = "http://localhost:8080/upload/2025/01/15/uuid_image.jpg")
     private String imageUrl;
 
-    @Schema(description = "썸네일 URL", example = "http://localhost:8080/upload/2025/01/15/s_uuid_image.jpg")
-    private String thumbnailUrl;
 
     @Schema(description = "UUID", example = "123e4567-e89b-12d3-a456-426614174000")
     private String uuid;

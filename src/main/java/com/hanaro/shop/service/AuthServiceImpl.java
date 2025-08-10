@@ -161,22 +161,4 @@ public class AuthServiceImpl implements AuthService {
         log.info("로그아웃: {}", member.getEmail());
     }
 
-    // 관리자 계정 초기화 (애플리케이션 시작 시 실행)
-    @Override
-    // @PostConstruct
-    @Transactional
-    public void initializeAdminAccount() {
-        if (!memberRepository.existsByEmail("hanaro@hanaro.com")) {
-            Member admin = Member.builder()
-                    .email("hanaro@hanaro.com")
-                    .password(passwordEncoder.encode("12345678"))
-                    .name("관리자")
-                    .nickname("admin")
-                    .role(Role.ADMIN)
-                    .build();
-
-            memberRepository.save(admin);
-            log.info("기본 관리자 계정이 생성되었습니다: hanaro@hanaro.com / 12345678");
-        }
-    }
 }

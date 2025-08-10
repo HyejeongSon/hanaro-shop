@@ -27,4 +27,7 @@ public class UploadResultDTO {
 
     @Schema(description = "파일 경로", example = "/upload/2025/01/15")
     private String filePath;
+
+    @Schema(description = "썸네일 파일 정보")
+    private UploadResultDTO thumbnail;
 }

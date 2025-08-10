@@ -44,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
                 UploadResultDTO result = uploadResults.get(i);
                 boolean isMainImage = i == 0; // 첫 번째 이미지를 메인으로 설정
                 
+                // 원본 이미지 저장
                 savedProduct.addImage(com.hanaro.shop.domain.ProductImage.builder()
                         .fileName(result.getUuid() + "_" + result.getFileName())
                         .originalFileName(result.getFileName())
@@ -53,6 +54,20 @@ public class ProductServiceImpl implements ProductService {
                         .isThumbnail(false)
                         .isMainImage(isMainImage)
                         .build());
+                
+                // 썸네일 이미지 저장
+                if (result.getThumbnail() != null) {
+                    UploadResultDTO thumbnail = result.getThumbnail();
+                    savedProduct.addImage(com.hanaro.shop.domain.ProductImage.builder()
+                            .fileName(thumbnail.getFileName())
+                            .originalFileName("s_" + result.getFileName())
+                            .filePath(thumbnail.getFilePath())
+                            .uuid(thumbnail.getUuid())
+                            .fileSize(thumbnail.getFileSize())
+                            .isThumbnail(true)
+                            .isMainImage(false)
+                            .build());
+                }
             }
             
             savedProduct = productRepository.save(savedProduct);
@@ -116,6 +131,7 @@ public class ProductServiceImpl implements ProductService {
                 UploadResultDTO result = uploadResults.get(i);
                 boolean isMainImage = i == 0; // 첫 번째를 메인으로
                 
+                // 원본 이미지 저장
                 product.addImage(com.hanaro.shop.domain.ProductImage.builder()
                         .fileName(result.getUuid() + "_" + result.getFileName())
                         .originalFileName(result.getFileName())
@@ -125,6 +141,20 @@ public class ProductServiceImpl implements ProductService {
                         .isThumbnail(false)
                         .isMainImage(isMainImage)
                         .build());
+                
+                // 썸네일 이미지 저장
+                if (result.getThumbnail() != null) {
+                    UploadResultDTO thumbnail = result.getThumbnail();
+                    product.addImage(com.hanaro.shop.domain.ProductImage.builder()
+                            .fileName(thumbnail.getFileName())
+                            .originalFileName("s_" + result.getFileName())
+                            .filePath(thumbnail.getFilePath())
+                            .uuid(thumbnail.getUuid())
+                            .fileSize(thumbnail.getFileSize())
+                            .isThumbnail(true)
+                            .isMainImage(false)
+                            .build());
+                }
             }
         }
         

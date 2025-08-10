@@ -4,11 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "order_items")
@@ -16,8 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class OrderItem {
+public class OrderItem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,10 +42,6 @@ public class OrderItem {
     @NotNull(message = "총 가격은 필수입니다")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
 
     public void setOrder(Order order) {
         this.order = order;

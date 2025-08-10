@@ -20,6 +20,4 @@ public interface AuthService {
     // 로그아웃
     void signOut(Long memberId);
 
-    // 관리자 계정 초기화
-    void initializeAdminAccount();
 }

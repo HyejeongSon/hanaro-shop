@@ -59,7 +59,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("사용자 API")
                 .displayName("User API")
-                .pathsToMatch("/api/member/**")
+                .pathsToMatch("/api/cart/**")
                 .addOpenApiCustomizer(openApi -> openApi
                         .info(new Info()
                                 .title("Hanaro Shop - User API")
