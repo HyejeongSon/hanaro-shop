@@ -28,6 +28,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final MemberRepository memberRepository;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        // Preflight 요청은 체크하지 않음
+        if(request.getMethod().equals("OPTIONS")) {
+            return true;
+        }
+
+        String path = request.getRequestURI();
+
+        // 인증이 필요 없는 경로들
+        return path.startsWith("/swagger-ui/") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/upload/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         
@@ -57,4 +73,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
+
 }
