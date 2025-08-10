@@ -56,25 +56,12 @@ public class ProductMapper {
         String baseUrl = getBaseUrl();
         String imageUrl = baseUrl + "/upload" + image.getFilePath();
         
-        // 썸네일 URL 생성 (s_ 접두사 추가)
-        String thumbnailPath = image.getFilePath();
-        String thumbnailUrl = null;
-        if (thumbnailPath != null) {
-            String[] pathParts = thumbnailPath.split("/");
-            if (pathParts.length > 0) {
-                String fileName = pathParts[pathParts.length - 1];
-                String directory = thumbnailPath.substring(0, thumbnailPath.lastIndexOf("/"));
-                thumbnailUrl = baseUrl + "/upload" + directory + "/s_" + fileName;
-            }
-        }
-        
         return ProductImageResponse.builder()
                 .id(image.getId())
                 .fileName(image.getFileName())
                 .originalFileName(image.getOriginalFileName())
                 .filePath(image.getFilePath())
                 .imageUrl(imageUrl)
-                .thumbnailUrl(thumbnailUrl)
                 .uuid(image.getUuid())
                 .fileSize(image.getFileSize())
                 .isThumbnail(image.getIsThumbnail())

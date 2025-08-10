@@ -67,23 +67,37 @@ public class FileUploadServiceImpl implements FileUploadService {
 
             boolean isImage = false;
             
-            // 이미지 파일인 경우 썸네일 생성
-            if (Files.probeContentType(savePath).startsWith("image")) {
-                isImage = true;
-                File thumbFile = new File(uploadDir, "s_" + savedFileName);
-                Thumbnailator.createThumbnail(savePath.toFile(), thumbFile, 200, 200);
-                log.info("Thumbnail created: {}", thumbFile.getName());
-            }
-
-            log.info("File uploaded successfully: {}", savedFileName);
-            
-            return UploadResultDTO.builder()
+            UploadResultDTO.UploadResultDTOBuilder resultBuilder = UploadResultDTO.builder()
                     .uuid(uuid)
                     .fileName(originalFilename)
                     .img(isImage)
                     .fileSize(file.getSize())
-                    .filePath("/" + dateStr + "/" + savedFileName)
-                    .build();
+                    .filePath("/" + dateStr + "/" + savedFileName);
+
+            // 이미지 파일인 경우 썸네일 생성
+            if (Files.probeContentType(savePath).startsWith("image")) {
+                isImage = true;
+                String thumbnailFileName = "s_" + savedFileName;
+                File thumbFile = new File(uploadDir, thumbnailFileName);
+                Thumbnailator.createThumbnail(savePath.toFile(), thumbFile, 200, 200);
+                log.info("Thumbnail created: {}", thumbFile.getName());
+
+                // 썸네일 정보 추가
+                UploadResultDTO thumbnailInfo = UploadResultDTO.builder()
+                        .uuid(uuid)
+                        .fileName(thumbnailFileName)
+                        .img(true)
+                        .fileSize(thumbFile.length())
+                        .filePath("/" + dateStr + "/" + thumbnailFileName)
+                        .build();
+
+                resultBuilder.thumbnail(thumbnailInfo);
+            }
+
+            resultBuilder.img(isImage);
+            log.info("File uploaded successfully: {}", savedFileName);
+            
+            return resultBuilder.build();
 
         } catch (IOException e) {
             log.error("Failed to upload file: {}", file.getOriginalFilename(), e);
@@ -117,23 +131,6 @@ public class FileUploadServiceImpl implements FileUploadService {
             String physicalPath = cleanFileName.replace("/", File.separator);
             Path filePath = Paths.get(uploadPath, physicalPath);
             Files.deleteIfExists(filePath);
-            
-            // 썸네일 삭제 (원본 파일인 경우만)
-            if (!fileName.contains("s_")) {
-                int lastSlashIndex = fileName.lastIndexOf("/");
-                if (lastSlashIndex != -1) {
-                    String directory = fileName.substring(0, lastSlashIndex);
-                    String originalFileName = fileName.substring(lastSlashIndex + 1);
-                    String thumbnailPath = directory + "/s_" + originalFileName;
-                    
-                    // 물리 경로로 변환 (맨 앞 / 제거)
-                    String thumbnailPhysicalPath = thumbnailPath.startsWith("/") ? thumbnailPath.substring(1) : thumbnailPath;
-                    thumbnailPhysicalPath = thumbnailPhysicalPath.replace("/", File.separator);
-                    Path thumbPath = Paths.get(uploadPath, thumbnailPhysicalPath);
-                    Files.deleteIfExists(thumbPath);
-                    log.info("Thumbnail deleted: {}", thumbnailPath);
-                }
-            }
             
             log.info("File deleted successfully: {}", fileName);
             
