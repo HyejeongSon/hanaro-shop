@@ -6,7 +6,6 @@ import com.hanaro.shop.domain.Member;
 import com.hanaro.shop.domain.Product;
 import com.hanaro.shop.dto.request.CartItemRequest;
 import com.hanaro.shop.dto.response.CartResponse;
-import com.hanaro.shop.dto.response.CartSummaryResponse;
 import com.hanaro.shop.exception.BusinessException;
 import com.hanaro.shop.exception.ErrorCode;
 import com.hanaro.shop.mapper.CartMapper;
@@ -128,41 +127,12 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
-
-    @Override
-    @Transactional(readOnly = true)
-    public int getCartItemCount(Long memberId) {
-        return cartRepository.findByMemberId(memberId)
-                .map(cart -> cart.getTotalQuantity())
-                .orElse(0);
-    }
-
     @Override
     @Transactional(readOnly = true)
     public int getCartItemTypes(Long memberId) {
         return cartRepository.findByMemberId(memberId)
                 .map(cart -> cart.getItems().size())
                 .orElse(0);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public CartSummaryResponse getCartSummary(Long memberId) {
-        return cartRepository.findByMemberId(memberId)
-                .map(cart -> CartSummaryResponse.builder()
-                        .memberId(memberId)
-                        .totalQuantity(cart.getTotalQuantity())
-                        .totalTypes(cart.getItems().size())
-                        .totalPrice(cart.getTotalPrice())
-                        .isEmpty(cart.isEmpty())
-                        .build())
-                .orElse(CartSummaryResponse.builder()
-                        .memberId(memberId)
-                        .totalQuantity(0)
-                        .totalTypes(0)
-                        .totalPrice(java.math.BigDecimal.ZERO)
-                        .isEmpty(true)
-                        .build());
     }
 
     @Override
