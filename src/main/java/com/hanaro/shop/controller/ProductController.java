@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
 @Tag(name = "Product - 상품 조회", description = "상품 조회 API (사용자/관리자 공용)")
 public class ProductController {

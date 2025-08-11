@@ -18,7 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/api/members")
 @RequiredArgsConstructor
 @Tag(name = "Member - 내 정보 관리", description = "개인정보 수정, 비밀번호 변경, 회원 탈퇴")
 public class MemberController {
