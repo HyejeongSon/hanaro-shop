@@ -19,7 +19,7 @@ public class Member extends BaseEntity {
     private Long id;
 
     @NotBlank(message = "이메일은 필수입니다")
-    @Email(message = "올바른 이메일 형식이 아닙니다")
+    // @Email(message = "올바른 이메일 형식이 아닙니다")
     @Column(unique = true, nullable = false)
     private String email;
 

@@ -15,25 +15,13 @@ import java.util.Optional;
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
-    List<CartItem> findByCartId(Long cartId);
-
-    Optional<CartItem> findByCartAndProduct(Cart cart, Product product);
-
     Optional<CartItem> findByCartIdAndProductId(Long cartId, Long productId);
-
-    @Query("SELECT ci FROM CartItem ci JOIN FETCH ci.product WHERE ci.cart.id = :cartId")
-    List<CartItem> findByCartIdWithProduct(@Param("cartId") Long cartId);
-
-    boolean existsByCartIdAndProductId(Long cartId, Long productId);
 
     @Modifying
     @Query("DELETE FROM CartItem ci WHERE ci.cart.id = :cartId")
     void deleteByCartId(@Param("cartId") Long cartId);
 
-    @Modifying
-    @Query("DELETE FROM CartItem ci WHERE ci.cart.id = :cartId AND ci.product.id = :productId")
-    void deleteByCartIdAndProductId(@Param("cartId") Long cartId, @Param("productId") Long productId);
-
-    @Query("SELECT COUNT(ci) FROM CartItem ci WHERE ci.cart.id = :cartId")
-    int countByCartId(@Param("cartId") Long cartId);
+    // cartItemIds 목록에 해당하는 CartItem들을, 각각 연관된 Product까지 한 번에 로딩해서 반환
+    @Query("SELECT ci FROM CartItem ci JOIN FETCH ci.product WHERE ci.id IN :cartItemIds")
+    List<CartItem> findByIdInWithProduct(@Param("cartItemIds") List<Long> cartItemIds);
 }

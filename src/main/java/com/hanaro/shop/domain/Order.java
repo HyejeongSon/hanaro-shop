@@ -82,24 +82,16 @@ public class Order extends BaseEntity {
         );
     }
 
-    public void refundOrder() {
-        if (this.status == OrderStatus.REFUNDED) {
-            throw new IllegalStateException("이미 환불된 주문입니다.");
-        }
-        this.status = OrderStatus.REFUNDED;
-    }
-
-    public BigDecimal calculateTotalAmount() {
-        return orderItems.stream()
+    public void calculateTotalAmount() {
+        this.totalAmount = orderItems.stream()
                 .map(OrderItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public boolean canCancel() {
-        return this.status == OrderStatus.ORDERED;
+        // 주문 상태가 ORDERED이고, 배송 대기 상태에서만 취소 가능
+        return this.status == OrderStatus.ORDERED && 
+               (this.delivery == null || this.delivery.getStatus() == DeliveryStatus.PENDING);
     }
 
-    public boolean canRefund() {
-        return this.status != OrderStatus.REFUNDED;
-    }
 }

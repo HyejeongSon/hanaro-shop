@@ -2,7 +2,6 @@ package com.hanaro.shop.service;
 
 import com.hanaro.shop.dto.request.CartItemRequest;
 import com.hanaro.shop.dto.response.CartResponse;
-import com.hanaro.shop.dto.response.CartSummaryResponse;
 
 public interface CartService {
     
@@ -16,12 +15,7 @@ public interface CartService {
     
     void clearCart(Long memberId);
     
-    int getCartItemCount(Long memberId);
-    
-    // 새로 추가되는 API들
     int getCartItemTypes(Long memberId);
-    
-    CartSummaryResponse getCartSummary(Long memberId);
     
     CartResponse increaseCartItem(Long memberId, Long productId, Integer amount);
     

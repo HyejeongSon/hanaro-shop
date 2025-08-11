@@ -6,7 +6,6 @@ import com.hanaro.shop.domain.Member;
 import com.hanaro.shop.domain.Product;
 import com.hanaro.shop.dto.request.CartItemRequest;
 import com.hanaro.shop.dto.response.CartResponse;
-import com.hanaro.shop.dto.response.CartSummaryResponse;
 import com.hanaro.shop.exception.BusinessException;
 import com.hanaro.shop.exception.ErrorCode;
 import com.hanaro.shop.mapper.CartMapper;
@@ -51,7 +50,7 @@ public class CartServiceImpl implements CartService {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
-        Optional<CartItem> existingItem = cartItemRepository.findByCartAndProduct(cart, product);
+        Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
         if (existingItem.isPresent()) {
             CartItem cartItem = existingItem.get();
@@ -91,7 +90,7 @@ public class CartServiceImpl implements CartService {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         cartItem.updateQuantity(quantity);
@@ -108,7 +107,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         cart.removeItem(cartItem);
@@ -128,41 +127,12 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
-
-    @Override
-    @Transactional(readOnly = true)
-    public int getCartItemCount(Long memberId) {
-        return cartRepository.findByMemberId(memberId)
-                .map(cart -> cart.getTotalQuantity())
-                .orElse(0);
-    }
-
     @Override
     @Transactional(readOnly = true)
     public int getCartItemTypes(Long memberId) {
         return cartRepository.findByMemberId(memberId)
                 .map(cart -> cart.getItems().size())
                 .orElse(0);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public CartSummaryResponse getCartSummary(Long memberId) {
-        return cartRepository.findByMemberId(memberId)
-                .map(cart -> CartSummaryResponse.builder()
-                        .memberId(memberId)
-                        .totalQuantity(cart.getTotalQuantity())
-                        .totalTypes(cart.getItems().size())
-                        .totalPrice(cart.getTotalPrice())
-                        .isEmpty(cart.isEmpty())
-                        .build())
-                .orElse(CartSummaryResponse.builder()
-                        .memberId(memberId)
-                        .totalQuantity(0)
-                        .totalTypes(0)
-                        .totalPrice(java.math.BigDecimal.ZERO)
-                        .isEmpty(true)
-                        .build());
     }
 
     @Override
@@ -177,7 +147,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         int newQuantity = cartItem.getQuantity() + amount;
@@ -205,7 +175,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         int newQuantity = cartItem.getQuantity() - amount;

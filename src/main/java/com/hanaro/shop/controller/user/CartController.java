@@ -2,7 +2,6 @@ package com.hanaro.shop.controller.user;
 
 import com.hanaro.shop.dto.request.CartItemRequest;
 import com.hanaro.shop.dto.response.CartResponse;
-import com.hanaro.shop.dto.response.CartSummaryResponse;
 import com.hanaro.shop.security.CustomUserDetails;
 import com.hanaro.shop.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,15 +73,6 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/count")
-    @Operation(summary = "장바구니 상품 개수 조회", description = "장바구니에 담긴 상품의 총 개수를 조회합니다.")
-    public ResponseEntity<Integer> getCartItemCount(
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        
-        int count = cartService.getCartItemCount(userDetails.getMember().getId());
-        return ResponseEntity.ok(count);
-    }
-
     @GetMapping("/types")
     @Operation(summary = "장바구니 상품 종류 개수 조회", description = "장바구니에 담긴 상품 종류의 개수를 조회합니다.")
     public ResponseEntity<Integer> getCartItemTypes(
@@ -90,15 +80,6 @@ public class CartController {
         
         int types = cartService.getCartItemTypes(userDetails.getMember().getId());
         return ResponseEntity.ok(types);
-    }
-
-    @GetMapping("/summary")
-    @Operation(summary = "장바구니 요약 정보 조회", description = "장바구니의 요약 정보(총 개수, 종류 수, 총 금액 등)를 조회합니다.")
-    public ResponseEntity<CartSummaryResponse> getCartSummary(
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        
-        CartSummaryResponse summary = cartService.getCartSummary(userDetails.getMember().getId());
-        return ResponseEntity.ok(summary);
     }
 
     @PatchMapping("/items/{productId}/increase")

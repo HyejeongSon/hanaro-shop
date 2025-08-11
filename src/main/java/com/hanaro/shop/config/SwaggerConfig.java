@@ -59,7 +59,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("사용자 API")
                 .displayName("User API")
-                .pathsToMatch("/api/cart/**")
+                .pathsToMatch("/api/cart/**", "/api/orders/**")
                 .addOpenApiCustomizer(openApi -> openApi
                         .info(new Info()
                                 .title("Hanaro Shop - User API")
@@ -73,7 +73,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("공통 API")
                 .displayName("Public API")
-                .pathsToMatch("/api/auth/**", "/api/member/**", "/api/product/**")
+                .pathsToMatch("/api/auth/**", "/api/members/**", "/api/products/**")
                 .addOpenApiCustomizer(openApi -> openApi
                         .info(new Info()
                                 .title("Hanaro Shop - Public API")

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/admin/product")
+@RequestMapping("/api/admin/products")
 @RequiredArgsConstructor
 @Tag(name = "Admin - 상품 관리", description = "관리자 전용 상품 관리 API")
 @PreAuthorize("hasRole('ADMIN')")
