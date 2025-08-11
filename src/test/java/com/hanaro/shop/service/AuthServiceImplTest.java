@@ -26,10 +26,10 @@ class AuthServiceImplTest {
     @DisplayName("관리자 계정 생성")
     void initializeAdminAccount_FirstTime_ShouldCreateAdminAccount() {
         // when
-        if (!memberRepository.existsByEmail("admin@hanaro.com")) {
+        if (!memberRepository.existsByEmail("hanaro")) {
             Member admin = Member.builder()
-                    .email("admin@hanaro.com")
-                    .password(passwordEncoder.encode("admin1234!"))
+                    .email("hanaro")
+                    .password(passwordEncoder.encode("12345678"))
                     .name("관리자")
                     .nickname("admin")
                     .phone("02-1234-5678")
@@ -41,16 +41,16 @@ class AuthServiceImplTest {
         }
 
         // then
-        assertTrue(memberRepository.existsByEmail("admin@hanaro.com"));
+        assertTrue(memberRepository.existsByEmail("hanaro"));
         
-        Member admin = memberRepository.findByEmail("admin@hanaro.com").get();
-        assertEquals("admin@hanaro.com", admin.getEmail());
+        Member admin = memberRepository.findByEmail("hanaro").get();
+        assertEquals("hanaro", admin.getEmail());
         assertEquals("관리자", admin.getName());
         assertEquals("admin", admin.getNickname());
         assertEquals("02-1234-5678", admin.getPhone());
         assertEquals("서울시 중구 을지로 하나로빌딩", admin.getAddress());
         assertEquals(Role.ADMIN, admin.getRole());
-        assertTrue(passwordEncoder.matches("admin1234!", admin.getPassword()));
+        assertTrue(passwordEncoder.matches("12345678", admin.getPassword()));
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.hanaro.shop.domain;
 
+import com.hanaro.shop.exception.BusinessException;
+import com.hanaro.shop.exception.ErrorCode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -68,7 +70,7 @@ public class OrderItem extends BaseEntity {
     public static OrderItem createOrderItem(Product product, Integer quantity) {
         // 재고 확인
         if (product.getStockQuantity() < quantity) {
-            throw new IllegalArgumentException("재고가 부족합니다. 요청수량: " + quantity + ", 재고: " + product.getStockQuantity());
+            throw new BusinessException(ErrorCode.INSUFFICIENT_STOCK);
         }
 
         // 재고 차감

@@ -31,12 +31,13 @@ public enum ErrorCode {
     CART_NOT_FOUND("C001", "장바구니를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     CART_ITEM_NOT_FOUND("C002", "장바구니에서 해당 상품을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     INVALID_QUANTITY("C003", "잘못된 수량입니다", HttpStatus.BAD_REQUEST),
+    CART_EMPTY("C004", "장바구니가 비어있습니다", HttpStatus.BAD_REQUEST),
     
     // 주문 관련
     ORDER_NOT_FOUND("O001", "주문을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     ORDER_ALREADY_CANCELED("O002", "이미 취소된 주문입니다", HttpStatus.BAD_REQUEST),
     ORDER_CANNOT_CANCEL("O003", "취소할 수 없는 주문입니다", HttpStatus.BAD_REQUEST),
-    INSUFFICIENT_STOCK("O004", "재고가 부족합니다", HttpStatus.BAD_REQUEST),
+    INSUFFICIENT_STOCK("O005", "재고가 부족합니다", HttpStatus.BAD_REQUEST),
     
     // 배송 관련
     DELIVERY_NOT_FOUND("D001", "배송 정보를 찾을 수 없습니다", HttpStatus.NOT_FOUND),

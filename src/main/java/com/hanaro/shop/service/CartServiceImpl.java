@@ -50,7 +50,7 @@ public class CartServiceImpl implements CartService {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
-        Optional<CartItem> existingItem = cartItemRepository.findByCartAndProduct(cart, product);
+        Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
 
         if (existingItem.isPresent()) {
             CartItem cartItem = existingItem.get();
@@ -90,7 +90,7 @@ public class CartServiceImpl implements CartService {
             throw new BusinessException(ErrorCode.PRODUCT_OUT_OF_STOCK);
         }
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         cartItem.updateQuantity(quantity);
@@ -107,7 +107,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         cart.removeItem(cartItem);
@@ -147,7 +147,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         int newQuantity = cartItem.getQuantity() + amount;
@@ -175,7 +175,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
 
-        CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
+        CartItem cartItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
         int newQuantity = cartItem.getQuantity() - amount;
