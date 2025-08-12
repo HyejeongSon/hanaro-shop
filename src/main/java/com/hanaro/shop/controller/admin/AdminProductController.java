@@ -29,17 +29,8 @@ public class AdminProductController {
     public ResponseEntity<ProductResponse> createProduct(
             @Parameter(description = "상품 정보", required = true) @Valid @ModelAttribute ProductRequest request) {
         
-        // 이미지를 별도 파라미터로 받는 것이 일반적이지만, Swagger 테스트 편의를 위해 ProductRequest에 images 필드를 포함하여 @ModelAttribute로 처리
-        // @Parameter(description = "상품 이미지 파일들") @RequestParam(value = "images", required = false) List<MultipartFile> images
-
-        try {
-            ProductResponse product = productService.createProduct(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(product);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        ProductResponse product = productService.createProduct(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -49,14 +40,8 @@ public class AdminProductController {
             @Parameter(description = "상품 정보", required = true) 
             @Valid @ModelAttribute ProductRequest request) {
         
-        try {
-            ProductResponse product = productService.updateProduct(productId, request);
-            return ResponseEntity.ok(product);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        ProductResponse product = productService.updateProduct(productId, request);
+        return ResponseEntity.ok(product);
     }
 
     @PatchMapping("/{productId}/stock")
@@ -65,12 +50,8 @@ public class AdminProductController {
             @Parameter(description = "상품 ID", required = true) @PathVariable Long productId,
             @Parameter(description = "재고 수량", required = true) @RequestParam Integer quantity) {
         
-        try {
-            ProductResponse product = productService.updateStockQuantity(productId, quantity);
-            return ResponseEntity.ok(product);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        ProductResponse product = productService.updateStockQuantity(productId, quantity);
+        return ResponseEntity.ok(product);
     }
 
     @PatchMapping("/{productId}/status")
@@ -79,12 +60,8 @@ public class AdminProductController {
             @Parameter(description = "상품 ID", required = true) @PathVariable Long productId,
             @Parameter(description = "활성화 여부", required = true) @RequestParam Boolean active) {
         
-        try {
-            ProductResponse product = productService.updateProductStatus(productId, active);
-            return ResponseEntity.ok(product);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        ProductResponse product = productService.updateProductStatus(productId, active);
+        return ResponseEntity.ok(product);
     }
 
     @DeleteMapping("/{productId}")
@@ -92,11 +69,7 @@ public class AdminProductController {
     public ResponseEntity<Void> deleteProduct(
             @Parameter(description = "상품 ID", required = true) @PathVariable Long productId) {
         
-        try {
-            productService.deleteProduct(productId);
-            return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        productService.deleteProduct(productId);
+        return ResponseEntity.ok().build();
     }
 }
