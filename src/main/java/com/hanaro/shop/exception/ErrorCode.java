@@ -46,7 +46,12 @@ public enum ErrorCode {
     // 파일 업로드 관련
     FILE_UPLOAD_ERROR("F001", "파일 업로드 중 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_FILE_TYPE("F002", "지원하지 않는 파일 형식입니다", HttpStatus.BAD_REQUEST),
-    FILE_SIZE_EXCEEDED("F003", "파일 크기가 제한을 초과했습니다", HttpStatus.BAD_REQUEST);
+    FILE_SIZE_EXCEEDED("F003", "파일 크기가 제한을 초과했습니다", HttpStatus.BAD_REQUEST),
+    
+    // 통계 관련
+    STATISTICS_NOT_FOUND("S001", "해당 날짜의 통계를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
+    STATISTICS_ALREADY_EXISTS("S002", "이미 존재하는 통계입니다", HttpStatus.CONFLICT),
+    STATISTICS_GENERATION_FAILED("S003", "통계 생성 중 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR);
     
     private final String code;
     private final String message;
