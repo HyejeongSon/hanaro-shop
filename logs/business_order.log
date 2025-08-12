@@ -1,0 +1,12 @@
+2025-08-12 00:00:08.365 [hanaro-scheduler-4] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update
+2025-08-12 00:00:08.367 [hanaro-scheduler-3] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PREPARING to SHIPPING status update
+2025-08-12 00:00:08.368 [hanaro-scheduler-2] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting SHIPPING to COMPLETED status update
+2025-08-12 00:00:08.790 [hanaro-scheduler-3] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Delivery status updated: 1 deliveries changed to SHIPPING at: 2025-08-12T00:00:08.582167400
+2025-08-12 00:00:08.818 [hanaro-scheduler-4] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] No deliveries to update to PREPARING status
+2025-08-12 00:00:08.835 [hanaro-scheduler-2] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Delivery status updated: 3 deliveries changed to COMPLETED at 2025-08-12T00:00:08.582167400
+2025-08-12 00:00:11.098 [hanaro-scheduler-1] INFO  c.h.shop.service.BatchServiceImpl - [BATCH_STATISTICS] Starting daily sales statistics generation for date: 2025-08-11
+2025-08-12 00:00:12.154 [hanaro-scheduler-1] INFO  c.h.shop.service.BatchServiceImpl - [BATCH_STATISTICS] Daily product statistics generated: 3 products for date: 2025-08-11
+2025-08-12 00:00:12.154 [hanaro-scheduler-1] INFO  c.h.shop.service.BatchServiceImpl - [BATCH_STATISTICS] Daily sales statistics generated successfully - date: 2025-08-11, totalSales: 2780600.00, totalOrders: 4, totalProducts: 7, canceledOrders: 1
+2025-08-12 00:05:04.713 [hanaro-scheduler-5] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update
+2025-08-12 00:05:13.032 [hanaro-scheduler-5] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] No deliveries to update to PREPARING status
+2025-08-12 00:07:33.696 [http-nio-8080-exec-2] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_ADMIN_CANCEL] Starting order cancellation by admin: orderId=4

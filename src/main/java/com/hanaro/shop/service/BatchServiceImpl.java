@@ -38,8 +38,10 @@ public class BatchServiceImpl implements BatchService {
     public void generateDailySalesStatistics() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         
+        log.info("[BATCH_STATISTICS] Starting daily sales statistics generation for date: {}", yesterday);
+        
         if (dailySalesStatisticsRepository.findByStatisticsDate(yesterday).isPresent()) {
-            log.info("이미 {} 날짜의 통계가 존재합니다. 생성을 건너뜁니다.", yesterday);
+            log.info("[BATCH_STATISTICS] Statistics already exists for date: {}. Skipping generation.", yesterday);
             return;
         }
         
@@ -74,11 +76,11 @@ public class BatchServiceImpl implements BatchService {
             // 상품별 통계 생성
             generateDailyProductStatistics(yesterday, savedDailyStats);
             
-            log.info("일별 매출 통계 생성 완료 - 날짜: {}, 총 매출: {}, 총 주문수: {}, 총 상품수: {}", 
-                    yesterday, totalSales, totalOrders, totalProducts);
+            log.info("[BATCH_STATISTICS] Daily sales statistics generated successfully - date: {}, totalSales: {}, totalOrders: {}, totalProducts: {}, canceledOrders: {}", 
+                    yesterday, totalSales, totalOrders, totalProducts, canceledOrders);
                     
         } catch (Exception e) {
-            log.error("일별 매출 통계 생성 중 오류 발생 - 날짜: {}, 오류: {}", yesterday, e.getMessage(), e);
+            log.error("[BATCH_STATISTICS] Error occurred during daily sales statistics generation - date: {}, error: {}", yesterday, e.getMessage(), e);
             throw new BusinessException(ErrorCode.SERVER_ERROR);
         }
     }
@@ -96,6 +98,13 @@ public class BatchServiceImpl implements BatchService {
                 
                 Optional<Product> productOpt = productRepository.findById(productId);
                 if (productOpt.isPresent()) {
+                    Product product = productOpt.get();
+                    
+                    // 삭제된 상품에 대한 로그 기록 (통계에서는 포함하되 로그로 추적)
+                    if (product.getIsDeleted() != null && product.getIsDeleted()) {
+                        log.warn("[BATCH_STATISTICS] Product deleted but included in statistics: productId={}, name={}", 
+                                productId, product.getName());
+                    }
                     DailyProductStatistics productStats = DailyProductStatistics.createStatistics(
                             date,
                             productOpt.get(),
@@ -106,19 +115,19 @@ public class BatchServiceImpl implements BatchService {
                     );
                     productStatsList.add(productStats);
                 } else {
-                    log.warn("상품 ID {}를 찾을 수 없어 통계에서 제외합니다.", productId);
+                    log.warn("[BATCH_STATISTICS] Product ID {} not found, excluding from statistics", productId);
                 }
             }
             
             if (!productStatsList.isEmpty()) {
                 dailyProductStatisticsRepository.saveAll(productStatsList);
-                log.info("상품별 일별 통계 {} 개 생성 완료 - 날짜: {}", productStatsList.size(), date);
+                log.info("[BATCH_STATISTICS] Daily product statistics generated: {} products for date: {}", productStatsList.size(), date);
             } else {
-                log.info("생성할 상품별 통계가 없습니다 - 날짜: {}", date);
+                log.info("[BATCH_STATISTICS] No product statistics to generate for date: {}", date);
             }
             
         } catch (Exception e) {
-            log.error("상품별 일별 통계 생성 중 오류 발생 - 날짜: {}, 오류: {}", date, e.getMessage(), e);
+            log.error("[BATCH_STATISTICS] Error occurred during daily product statistics generation - date: {}, error: {}", date, e.getMessage(), e);
             throw new BusinessException(ErrorCode.SERVER_ERROR);
         }
     }

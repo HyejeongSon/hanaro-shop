@@ -1,0 +1,2 @@
+2025-08-12 00:08:38.046 [http-nio-8080-exec-3] INFO  c.h.shop.service.ProductServiceImpl - [PRODUCT_STOCK] Starting stock quantity update: productId=3, newQuantity=150
+2025-08-12 00:08:38.113 [http-nio-8080-exec-3] INFO  c.h.shop.service.ProductServiceImpl - [PRODUCT_STOCK] Stock quantity updated successfully: id=3, oldQuantity=146, newQuantity=150

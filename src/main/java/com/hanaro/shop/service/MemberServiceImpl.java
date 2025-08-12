@@ -1,6 +1,7 @@
 package com.hanaro.shop.service;
 
 import com.hanaro.shop.domain.Member;
+import com.hanaro.shop.domain.Role;
 import com.hanaro.shop.dto.response.MemberResponse;
 import com.hanaro.shop.exception.BusinessException;
 import com.hanaro.shop.exception.ErrorCode;
@@ -42,7 +43,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Page<MemberResponse> getAllMembers(Pageable pageable) {
-        Page<Member> members = memberRepository.findAll(pageable);
+        // 관리자 제외하고 일반 사용자만 조회
+        Page<Member> members = memberRepository.findByRole(Role.USER, pageable);
         return members.map(MemberResponse::from);
     }
 

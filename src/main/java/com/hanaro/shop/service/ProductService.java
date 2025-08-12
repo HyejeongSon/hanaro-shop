@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface ProductService {
     
     ProductResponse createProduct(ProductRequest request);
-    
-    Optional<ProductResponse> getProduct(Long productId);
+
+    ProductResponse getProduct(Long productId);
     
     Page<ProductResponse> getProducts(Pageable pageable);
     
