@@ -176,11 +176,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
+        Integer oldQuantity = product.getStockQuantity();
         product.updateStockQuantity(quantity);
         
         Product updatedProduct = productRepository.save(product);
         log.info("[PRODUCT_STOCK] Stock quantity updated successfully: id={}, oldQuantity={}, newQuantity={}", 
-                updatedProduct.getId(), product.getStockQuantity(), updatedProduct.getStockQuantity());
+                updatedProduct.getId(), oldQuantity, updatedProduct.getStockQuantity());
         return productMapper.toResponse(updatedProduct);
     }
 

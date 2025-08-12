@@ -41,8 +41,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         int updatedCount = deliveryRepository.updateAllPreparingToShipping(shippedAt, trackingNumber);
         
         if (updatedCount > 0) {
-            log.info("[DELIVERY_SCHEDULER] Delivery status updated: {} deliveries changed to SHIPPING with tracking: {}", 
-                    updatedCount, trackingNumber);
+            log.info("[DELIVERY_SCHEDULER] Delivery status updated: {} deliveries changed to SHIPPING at: {}",
+                    updatedCount, shippedAt);
         } else {
             log.info("[DELIVERY_SCHEDULER] No deliveries to update to SHIPPING status");
         }

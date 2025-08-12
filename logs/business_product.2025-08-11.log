@@ -1,0 +1,4 @@
+2025-08-11 23:40:25.339 [http-nio-8080-exec-7] INFO  c.h.shop.service.ProductServiceImpl - [PRODUCT_STOCK] Starting stock quantity update: productId=2, newQuantity=60
+2025-08-11 23:40:25.393 [http-nio-8080-exec-7] INFO  c.h.shop.service.ProductServiceImpl - [PRODUCT_STOCK] Stock quantity updated successfully: id=2, oldQuantity=48, newQuantity=60
+2025-08-11 23:48:26.188 [http-nio-8080-exec-5] INFO  c.h.shop.service.ProductServiceImpl - [PRODUCT_CREATE] Starting product creation: name=고구마, category=FOOD, price=11900, stockQuantity=150
+2025-08-11 23:48:27.341 [http-nio-8080-exec-5] INFO  c.h.shop.service.ProductServiceImpl - [PRODUCT_CREATE] Product created successfully: id=3, name=고구마, imageCount=2

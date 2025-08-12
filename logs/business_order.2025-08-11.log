@@ -1,0 +1,33 @@
+2025-08-11 23:34:15.365 [http-nio-8080-exec-7] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Adding item to cart: memberId=2, productId=1, quantity=1
+2025-08-11 23:34:25.832 [http-nio-8080-exec-7] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Item added to cart successfully: memberId=2, totalItems=1, totalAmount=1
+2025-08-11 23:34:35.422 [http-nio-8080-exec-5] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Adding item to cart: memberId=2, productId=2, quantity=1
+2025-08-11 23:34:35.472 [http-nio-8080-exec-5] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Item added to cart successfully: memberId=2, totalItems=2, totalAmount=2
+2025-08-11 23:35:00.058 [hanaro-scheduler-1] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update
+2025-08-11 23:35:00.140 [hanaro-scheduler-1] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] No deliveries to update to PREPARING status
+2025-08-11 23:35:21.688 [http-nio-8080-exec-6] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Starting order creation from cart: memberEmail=user1@hanaro.com, cartItemCount=2, address=서울시 광진구
+2025-08-11 23:35:21.815 [http-nio-8080-exec-6] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Order created successfully: orderNumber=ORD202508112B9329E7, totalAmount=1344000.00, itemCount=2, deliveryAddress=서울시 광진구
+2025-08-11 23:35:44.161 [http-nio-8080-exec-4] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Adding item to cart: memberId=2, productId=2, quantity=1
+2025-08-11 23:35:44.187 [http-nio-8080-exec-4] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Item added to cart successfully: memberId=2, totalItems=1, totalAmount=1
+2025-08-11 23:35:57.427 [http-nio-8080-exec-9] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Starting order creation from cart: memberEmail=user1@hanaro.com, cartItemCount=1, address=서울시 광진구
+2025-08-11 23:35:57.454 [http-nio-8080-exec-9] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Order created successfully: orderNumber=ORD20250811693E4B67, totalAmount=45000.00, itemCount=1, deliveryAddress=서울시 광진구
+2025-08-11 23:36:35.617 [http-nio-8080-exec-7] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Adding item to cart: memberId=2, productId=2, quantity=1
+2025-08-11 23:36:35.627 [http-nio-8080-exec-7] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Item added to cart successfully: memberId=2, totalItems=1, totalAmount=1
+2025-08-11 23:37:02.193 [http-nio-8080-exec-5] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Starting order creation from cart: memberEmail=user1@hanaro.com, cartItemCount=1, address=서울시 광진구 구의동
+2025-08-11 23:37:02.215 [http-nio-8080-exec-5] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Order created successfully: orderNumber=ORD20250811D449BFAF, totalAmount=45000.00, itemCount=1, deliveryAddress=서울시 광진구 구의동
+2025-08-11 23:37:26.179 [http-nio-8080-exec-6] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CANCEL] Starting order cancellation by user: memberEmail=user1@hanaro.com, orderId=2
+2025-08-11 23:37:26.214 [http-nio-8080-exec-6] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CANCEL] Order cancelled successfully by user: orderNumber=ORD20250811693E4B67, totalAmount=45000.00
+2025-08-11 23:40:00.017 [hanaro-scheduler-3] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update
+2025-08-11 23:40:00.024 [hanaro-scheduler-3] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Delivery status updated: 2 deliveries changed to PREPARING
+2025-08-11 23:45:00.188 [hanaro-scheduler-2] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update
+2025-08-11 23:45:00.188 [hanaro-scheduler-4] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PREPARING to SHIPPING status update
+2025-08-11 23:45:00.352 [hanaro-scheduler-2] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] No deliveries to update to PREPARING status
+2025-08-11 23:45:00.511 [hanaro-scheduler-4] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Delivery status updated: 2 deliveries changed to SHIPPING at: 2025-08-11T23:45:00.205323200
+2025-08-11 23:50:00.025 [hanaro-scheduler-3] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update
+2025-08-11 23:50:00.054 [hanaro-scheduler-3] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] No deliveries to update to PREPARING status
+2025-08-11 23:51:09.256 [http-nio-8080-exec-1] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Adding item to cart: memberId=2, productId=3, quantity=4
+2025-08-11 23:51:09.975 [http-nio-8080-exec-1] INFO  c.h.shop.service.CartServiceImpl - [CART_ADD] Item added to cart successfully: memberId=2, totalItems=1, totalAmount=4
+2025-08-11 23:52:13.606 [http-nio-8080-exec-3] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Starting order creation from cart: memberEmail=user1@hanaro.com, cartItemCount=1, address=서울시 도봉구
+2025-08-11 23:52:13.999 [http-nio-8080-exec-3] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_CREATE] Order created successfully: orderNumber=ORD20250811B488A88C, totalAmount=47600.00, itemCount=1, deliveryAddress=서울시 도봉구
+2025-08-11 23:53:52.013 [http-nio-8080-exec-5] INFO  c.h.shop.service.OrderServiceImpl - [ORDER_LIST] User viewing order list: memberEmail=user1@hanaro.com, page=0, size=10
+2025-08-11 23:55:01.311 [hanaro-scheduler-1] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update
+2025-08-11 23:55:01.557 [hanaro-scheduler-1] INFO  c.h.s.service.SchedulerServiceImpl - [DELIVERY_SCHEDULER] Delivery status updated: 1 deliveries changed to PREPARING
