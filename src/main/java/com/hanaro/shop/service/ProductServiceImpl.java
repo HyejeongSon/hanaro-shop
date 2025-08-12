@@ -83,11 +83,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ProductResponse> getProduct(Long productId) {
+    public ProductResponse getProduct(Long productId) {
         return productRepository.findByIdAndIsDeletedFalse(productId)
-                .map(productMapper::toResponse);
+                .map(productMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -102,7 +102,6 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productRepository.findByCategoryAndIsDeletedFalse(category);
         return productMapper.toResponseList(products);
     }
-
 
     @Override
     public ProductResponse updateProduct(Long productId, ProductRequest request) {

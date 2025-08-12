@@ -27,10 +27,9 @@ public class ProductController {
     @Operation(summary = "상품 조회", description = "특정 상품의 상세 정보를 조회합니다.")
     public ResponseEntity<ProductResponse> getProduct(
             @Parameter(description = "상품 ID", required = true) @PathVariable Long productId) {
-        
-        return productService.getProduct(productId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+
+        ProductResponse product = productService.getProduct(productId);
+        return ResponseEntity.ok(product);
     }
 
     @GetMapping
