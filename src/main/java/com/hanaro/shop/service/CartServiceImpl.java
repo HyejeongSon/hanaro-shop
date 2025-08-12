@@ -233,7 +233,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private Product getProductById(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 }

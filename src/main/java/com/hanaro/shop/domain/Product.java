@@ -48,6 +48,9 @@ public class Product extends BaseEntity {
     @Builder.Default
     private Boolean isActive = true;
 
+    @Builder.Default
+    private Boolean isDeleted = false;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<ProductImage> images = new ArrayList<>();
@@ -98,5 +101,13 @@ public class Product extends BaseEntity {
 
     public void clearImages() {
         this.images.clear();
+    }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
+
+    public void restore() {
+        this.isDeleted = false;
     }
 }

@@ -84,7 +84,12 @@ public class OrderServiceImpl implements OrderService {
         for (CartItem cartItem : selectedCartItems) {
             Product product = cartItem.getProduct();
             
-            // 1. 상품 활성화 상태 확인
+            // 1. 상품 삭제 상태 확인
+            if (product.getIsDeleted() != null && product.getIsDeleted()) {
+                throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
+            }
+            
+            // 2. 상품 활성화 상태 확인
             if (product.getIsActive() == null || !product.getIsActive()) {
                 throw new BusinessException(ErrorCode.PRODUCT_INACTIVE);
             }

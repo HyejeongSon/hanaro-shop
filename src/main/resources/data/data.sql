@@ -583,6 +583,7 @@ CREATE TABLE `products` (
   `name` varchar(255) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `stock_quantity` int NOT NULL,
+  `is_deleted` bit(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `products_chk_1` CHECK ((`price` >= 0)),
   CONSTRAINT `products_chk_2` CHECK ((`stock_quantity` >= 0))
@@ -595,7 +596,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'2025-08-11 23:30:14.984518','2025-08-11 23:35:21.834395','ELECTRONICS','삼성 갤럭시 S25 최신 스마트폰입니다. 강력한 성능과 뛰어난 카메라 기능을 제공합니다.',_binary '','갤럭시 S25',1299000.00,99),(2,'2025-08-11 23:30:40.422124','2025-08-11 23:40:25.444151','BOOK','Joshua Bloch 저, 자바 개발자 필독서. 고급 자바 프로그래밍 기법과 모범 사례를 담았습니다.',_binary '','이펙티브 자바 3/E',45000.00,60),(3,'2025-08-11 23:48:26.216992','2025-08-12 00:08:38.197621','FOOD','전남 고흥 햇고구마로, 달콤하고 촉촉한 맛이 일품인 고구마입니다.',_binary '','고구마',11900.00,150);
+INSERT INTO `products` VALUES (1,'2025-08-11 23:30:14.984518','2025-08-11 23:35:21.834395','ELECTRONICS','삼성 갤럭시 S25 최신 스마트폰입니다. 강력한 성능과 뛰어난 카메라 기능을 제공합니다.',_binary '','갤럭시 S25',1299000.00,99,_binary '\0'),(2,'2025-08-11 23:30:40.422124','2025-08-11 23:40:25.444151','BOOK','Joshua Bloch 저, 자바 개발자 필독서. 고급 자바 프로그래밍 기법과 모범 사례를 담았습니다.',_binary '','이펙티브 자바 3/E',45000.00,60,_binary '\0'),(3,'2025-08-11 23:48:26.216992','2025-08-12 00:08:38.197621','FOOD','전남 고흥 햇고구마로, 달콤하고 촉촉한 맛이 일품인 고구마입니다.',_binary '','고구마',11900.00,150,_binary '\0');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -622,7 +623,7 @@ CREATE TABLE `refresh_tokens` (
 
 LOCK TABLES `refresh_tokens` WRITE;
 /*!40000 ALTER TABLE `refresh_tokens` DISABLE KEYS */;
-INSERT INTO `refresh_tokens` VALUES (1,'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzU0OTIzNzQ2LCJleHAiOjE3NTU1Mjg1NDZ9.veOGMgqNpL4_1sEchZnfoWEpIU-cJdc4zUU3v-1Fnyk',2),(2,'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzU0OTI0NzE0LCJleHAiOjE3NTU1Mjk1MTR9.7WRZam8yF_bt9D7yr2bpB8ebiFNTgRU7erPwMz3qY7M',1);
+INSERT INTO `refresh_tokens` VALUES (1,'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzU0OTIzNzQ2LCJleHAiOjE3NTU1Mjg1NDZ9.veOGMgqNpL4_1sEchZnfoWEpIU-cJdc4zUU3v-1Fnyk',2),(2,'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzU0OTk5NjEwLCJleHAiOjE3NTU2MDQ0MTB9.GdTqdvSlM5Sa6GcMuWpyOllZ-MX1ZkeO9Cvu7vRzO_w',1);
 /*!40000 ALTER TABLE `refresh_tokens` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -635,4 +636,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-08-12 18:32:56
+-- Dump completed on 2025-08-12 21:06:59

@@ -98,6 +98,13 @@ public class BatchServiceImpl implements BatchService {
                 
                 Optional<Product> productOpt = productRepository.findById(productId);
                 if (productOpt.isPresent()) {
+                    Product product = productOpt.get();
+                    
+                    // 삭제된 상품에 대한 로그 기록 (통계에서는 포함하되 로그로 추적)
+                    if (product.getIsDeleted() != null && product.getIsDeleted()) {
+                        log.warn("[BATCH_STATISTICS] Product deleted but included in statistics: productId={}, name={}", 
+                                productId, product.getName());
+                    }
                     DailyProductStatistics productStats = DailyProductStatistics.createStatistics(
                             date,
                             productOpt.get(),

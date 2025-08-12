@@ -84,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Optional<ProductResponse> getProduct(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndIsDeletedFalse(productId)
                 .map(productMapper::toResponse);
     }
 
@@ -92,14 +92,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductResponse> getProducts(Pageable pageable) {
-        return productRepository.findAll(pageable)
+        return productRepository.findByIsDeletedFalse(pageable)
                 .map(productMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByCategory(ProductCategory category) {
-        List<Product> products = productRepository.findByCategory(category);
+        List<Product> products = productRepository.findByCategoryAndIsDeletedFalse(category);
         return productMapper.toResponseList(products);
     }
 
@@ -109,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("[PRODUCT_UPDATE] Starting product update: id={}, name={}, price={}", 
                 productId, request.getName(), request.getPrice());
         
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         productMapper.updateEntity(product, request);
@@ -173,7 +173,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateStockQuantity(Long productId, Integer quantity) {
         log.info("[PRODUCT_STOCK] Starting stock quantity update: productId={}, newQuantity={}", productId, quantity);
         
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         Integer oldQuantity = product.getStockQuantity();
@@ -187,32 +187,24 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long productId) {
-        log.info("[PRODUCT_DELETE] Starting product deletion: id={}", productId);
+        log.info("[PRODUCT_DELETE] Starting product soft deletion: id={}", productId);
         
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
-        // 1. 먼저 연관된 물리 파일들 삭제
-        product.getImages().forEach(image -> {
-            try {
-                fileService.deleteFile(image.getFilePath());
-                log.info("Deleted physical file: {}", image.getFileName());
-            } catch (RuntimeException e) {
-                log.warn("Failed to delete physical file: {}", image.getFileName(), e);
-            }
-        });
+        // Soft delete: isDeleted 플래그를 true로 설정
+        product.softDelete();
+        productRepository.save(product);
         
-        // 2. DB에서 상품(및 연관 이미지) 삭제  
-        productRepository.delete(product);
-        log.info("[PRODUCT_DELETE] Product deleted successfully: id={}, name={}, imageCount={}", 
-                productId, product.getName(), product.getImages().size());
+        log.info("[PRODUCT_DELETE] Product soft deleted successfully: id={}, name={}", 
+                productId, product.getName());
     }
 
     @Override
     public ProductResponse updateProductStatus(Long productId, Boolean active) {
         log.info("[PRODUCT_STATUS] Starting product status update: productId={}, newActive={}", productId, active);
         
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
         
         if (active) {
@@ -230,7 +222,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> searchProducts(String keyword) {
-        List<Product> products = productRepository.findByNameOrDescriptionContainingIgnoreCase(keyword);
+        List<Product> products = productRepository.findByNameOrDescriptionContainingIgnoreCaseAndIsDeletedFalse(keyword);
         return productMapper.toResponseList(products);
     }
 
