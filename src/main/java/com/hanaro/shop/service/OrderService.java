@@ -29,6 +29,4 @@ public interface OrderService {
     // 주문 통계
     OrderSummaryResponse getOrderSummary();
     
-    // 배송 상태 업데이트 (스케줄러용)
-    void updateDeliveryStatusScheduled();
 }

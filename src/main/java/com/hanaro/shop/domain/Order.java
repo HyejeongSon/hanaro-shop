@@ -74,7 +74,18 @@ public class Order extends BaseEntity {
         if (this.status != OrderStatus.ORDERED) {
             throw new IllegalStateException("주문 완료 상태에서만 취소할 수 있습니다.");
         }
+        
+        // 배송이 시작된 주문은 취소 불가 (PENDING 상태에서만 취소 가능)
+        if (this.delivery != null && this.delivery.getStatus() != DeliveryStatus.PENDING) {
+            throw new IllegalStateException("배송 준비가 시작된 주문은 취소할 수 없습니다.");
+        }
+        
         this.status = OrderStatus.CANCELED;
+        
+        // 배송 취소 (PENDING 상태에서만 취소되므로 항상 가능)
+        if (this.delivery != null) {
+            this.delivery.cancelDelivery();
+        }
         
         // 재고 복구
         orderItems.forEach(orderItem -> 

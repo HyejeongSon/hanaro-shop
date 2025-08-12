@@ -289,50 +289,7 @@ public class OrderServiceImpl implements OrderService {
                 .canceledOrderCount(canceledCount)
                 .build();
     }
-    
-    @Override
-    @Transactional
-    public void updateDeliveryStatusScheduled() {
-        log.info("배송 상태 스케줄 업데이트 시작");
 
-        LocalDateTime now = LocalDateTime.now();
-
-        // 1. 배송 대기 -> 배송 준비 (5분 경과)
-        LocalDateTime fiveMinutesAgo = now.minusMinutes(5);
-        List<Delivery> pendingDeliveries = deliveryRepository
-                .findByStatusAndCreatedAtBefore(DeliveryStatus.PENDING, fiveMinutesAgo);
-
-        for (Delivery delivery : pendingDeliveries) {
-            delivery.updateStatus(DeliveryStatus.PREPARING);
-            log.info("배송 상태 변경: {} -> 배송 준비", delivery.getId());
-        }
-
-        // 2. 배송 준비 -> 배송 중 (15분 경과)
-        LocalDateTime fifteenMinutesAgo = now.minusMinutes(15);
-        List<Delivery> preparingDeliveries = deliveryRepository
-                .findByStatusAndCreatedAtBefore(DeliveryStatus.PREPARING, fifteenMinutesAgo);
-
-        for (Delivery delivery : preparingDeliveries) {
-            delivery.updateStatus(DeliveryStatus.SHIPPING);
-            delivery.setTrackingNumber("TK" + UUID.randomUUID().toString().substring(0, 8));
-            log.info("배송 상태 변경: {} -> 배송 중, 송장번호: {}",
-                    delivery.getId(), delivery.getTrackingNumber());
-        }
-
-        // 3. 배송 중 -> 배송 완료 (1시간 경과)
-        LocalDateTime oneHourAgo = now.minusHours(1);
-        List<Delivery> shippingDeliveries = deliveryRepository
-                .findByStatusAndShippedAtBefore(DeliveryStatus.SHIPPING, oneHourAgo);
-
-        for (Delivery delivery : shippingDeliveries) {
-            delivery.updateStatus(DeliveryStatus.COMPLETED);
-            log.info("배송 상태 변경: {} -> 배송 완료", delivery.getId());
-        }
-
-        log.info("배송 상태 스케줄 업데이트 완료: 배송준비={}, 배송시작={}, 배송완료={}",
-                pendingDeliveries.size(), preparingDeliveries.size(), shippingDeliveries.size());
-    }
-    
     private String generateOrderNumber() {
         String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String uuid = UUID.randomUUID().toString().substring(0, 8).toUpperCase();

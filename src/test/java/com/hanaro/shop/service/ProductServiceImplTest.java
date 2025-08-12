@@ -37,161 +37,163 @@ class ProductServiceImplTest {
     // 테스트용 업로드 경로 설정
     private final String uploadPath = "src/main/resources/static/upload";
 
-    @Test
-    @DisplayName("갤럭시 S25 상품 생성")
-    @Transactional
-    @Rollback(false)
-    void createGalaxyS25Product() {
-        // when - 갤럭시 S25 상품 생성
-        if (!productRepository.findByNameOrDescriptionContainingIgnoreCase("갤럭시 S25").isEmpty()) {
-            log.info("갤럭시 S25 상품이 이미 존재합니다.");
+    /**
+     * 더미 상품 생성 공통 메서드
+     */
+    private void createDummyProduct(String name,
+                                    String description,
+                                    BigDecimal price,
+                                    int stockQuantity,
+                                    ProductCategory category,
+                                    boolean isActive,
+                                    String... imageFileNames) {
+
+        if (!productRepository.findByNameOrDescriptionContainingIgnoreCase(name).isEmpty()) {
+            log.info("{} 상품이 이미 존재합니다.", name);
             return;
         }
 
         // 상품 생성
-        Product galaxyS25 = Product.builder()
-                .name("갤럭시 S25")
-                .description("삼성 갤럭시 S25 최신 스마트폰입니다. 강력한 성능과 뛰어난 카메라 기능을 제공합니다.")
-                .price(new BigDecimal("1299000"))
-                .stockQuantity(100)
-                .category(ProductCategory.ELECTRONICS)
-                .isActive(true)
+        Product product = Product.builder()
+                .name(name)
+                .description(description)
+                .price(price)
+                .stockQuantity(stockQuantity)
+                .category(category)
+                .isActive(isActive)
                 .build();
 
-        Product savedProduct = productRepository.save(galaxyS25);
+        Product savedProduct = productRepository.save(product);
 
-        // FileUploadService와 동일한 방식으로 이미지 정보 생성
-        String originalFileName = "갤럭시s25.png";
+        // UUID, 날짜 폴더명
         String uuid = UUID.randomUUID().toString();
-        String savedFileName = uuid + "_" + originalFileName;
-        
-        // 날짜별 디렉토리 경로 생성
         String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-        String webPath = "/" + dateStr + "/" + savedFileName;
 
-        // FileUploadServiceImpl과 동일한 방식으로 실제 파일 처리
+        for (int i = 0; i < imageFileNames.length; i++) {
+            String originalFileName = imageFileNames[i];
+            String savedFileName = uuid + "_" + originalFileName;
+            String webPath = "/" + dateStr + "/" + savedFileName;
+
+            // 원본 이미지 복사 + 썸네일 생성
+            long fileSize = copyAndGenerateThumbnail(originalFileName, savedFileName, dateStr);
+
+            // 원본 이미지 DB 저장
+            ProductImage image = ProductImage.builder()
+                    .fileName(savedFileName)
+                    .originalFileName(originalFileName)
+                    .filePath(webPath)
+                    .uuid(uuid)
+                    .fileSize(fileSize)
+                    .isThumbnail(false)
+                    .isMainImage(i == 0) // 첫 번째 이미지를 메인 이미지로
+                    .product(savedProduct)
+                    .build();
+            savedProduct.addImage(image);
+
+            // 썸네일 DB 저장
+            String thumbFileName = "s_" + savedFileName;
+            String thumbOriginalFileName = "s_" + originalFileName;
+            String thumbWebPath = "/" + dateStr + "/" + thumbFileName;
+            long thumbSize = getThumbnailFileSize(dateStr, thumbFileName, fileSize);
+
+            ProductImage thumbnailImage = ProductImage.builder()
+                    .fileName(thumbFileName)
+                    .originalFileName(thumbOriginalFileName)
+                    .filePath(thumbWebPath)
+                    .uuid(uuid)
+                    .fileSize(thumbSize)
+                    .isThumbnail(true)
+                    .isMainImage(false)
+                    .product(savedProduct)
+                    .build();
+            savedProduct.addImage(thumbnailImage);
+        }
+
+        productRepository.save(savedProduct);
+        log.info("{} 상품 생성 완료: ID={}", name, savedProduct.getId());
+    }
+
+    /**
+     * 원본 이미지 복사 + 썸네일 생성
+     */
+    private long copyAndGenerateThumbnail(String originalFileName, String savedFileName, String dateStr) {
         Path sourcePath = Paths.get("src", "main", "resources", "static", "origin", originalFileName);
         long fileSize = 0L;
-        
+
         try {
             if (Files.exists(sourcePath)) {
                 fileSize = Files.size(sourcePath);
-                System.out.println("실제 이미지 파일 크기: " + fileSize + " bytes");
-                
-                // 날짜별 업로드 디렉토리 생성
+
                 String uploadDir = uploadPath + File.separator + dateStr.replace("/", File.separator);
                 Path uploadDirPath = Paths.get(uploadDir);
                 if (!Files.exists(uploadDirPath)) {
                     Files.createDirectories(uploadDirPath);
-                    System.out.println("업로드 디렉토리 생성: " + uploadDir);
                 }
-                
-                // 원본 이미지를 upload 폴더로 복사
+
                 Path targetPath = Paths.get(uploadDir, savedFileName);
                 Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("이미지 파일 복사 완료: " + targetPath);
-                
-                // 썸네일 생성 (FileUploadServiceImpl과 동일)
+
+                // 썸네일 생성
                 File thumbnailFile = new File(uploadDir, "s_" + savedFileName);
                 Thumbnailator.createThumbnail(targetPath.toFile(), thumbnailFile, 200, 200);
-                System.out.println("썸네일 생성 완료: " + thumbnailFile.getName());
-                
+
             } else {
-                System.out.println("원본 이미지 파일을 찾을 수 없습니다: " + sourcePath);
-                fileSize = 163840L; // 기본값 160KB (실제 157KB, 160940 바이트)
+                log.warn("원본 이미지가 없습니다: {}", sourcePath);
+                fileSize = 160000L; // 기본값
             }
         } catch (IOException e) {
-            System.out.println("파일 처리 중 오류 발생: " + e.getMessage());
-            fileSize = 163840L; // 기본값
+            log.error("이미지 처리 중 오류: {}", e.getMessage());
+            fileSize = 160000L; // 기본값
         }
+        return fileSize;
+    }
 
-        // 원본 이미지 생성
-        ProductImage productImage = ProductImage.builder()
-                .fileName(savedFileName)
-                .originalFileName(originalFileName)
-                .filePath(webPath)
-                .uuid(uuid)
-                .fileSize(fileSize)
-                .isThumbnail(false)
-                .isMainImage(true)
-                .product(savedProduct)
-                .build();
-
-        // 상품에 원본 이미지 추가 (JPA Cascade로 자동 저장)
-        savedProduct.addImage(productImage);
-        
-        // 썸네일 이미지 생성
-        String thumbnailWebPath = "/" + dateStr + "/s_" + savedFileName;
-        long thumbnailSize = 0L;
+    /**
+     * 썸네일 파일 크기 확인 (없으면 원본의 1/4 크기 추정)
+     */
+    private long getThumbnailFileSize(String dateStr, String thumbFileName, long originalFileSize) {
         try {
-            Path thumbnailPath = Paths.get(uploadPath, dateStr.replace("/", File.separator), "s_" + savedFileName);
-            if (Files.exists(thumbnailPath)) {
-                thumbnailSize = Files.size(thumbnailPath);
-            } else {
-                thumbnailSize = fileSize / 4; // 썸네일은 대략 원본의 1/4 크기로 추정
+            Path thumbPath = Paths.get(uploadPath, dateStr.replace("/", File.separator), thumbFileName);
+            if (Files.exists(thumbPath)) {
+                return Files.size(thumbPath);
             }
         } catch (IOException e) {
-            thumbnailSize = fileSize / 4;
+            log.warn("썸네일 크기 확인 실패: {}", e.getMessage());
         }
-        
-        ProductImage thumbnailImage = ProductImage.builder()
-                .fileName("s_" + savedFileName)
-                .originalFileName("s_" + originalFileName)
-                .filePath(thumbnailWebPath)
-                .uuid(uuid)
-                .fileSize(thumbnailSize)
-                .isThumbnail(true)
-                .isMainImage(false)
-                .product(savedProduct)
-                .build();
+        return originalFileSize / 4;
+    }
 
-        // 상품에 썸네일 이미지도 추가
-        savedProduct.addImage(thumbnailImage);
-        
-        // 상품 다시 저장하여 이미지와 함께 영속화
-        productRepository.save(savedProduct);
+    // ========================= 테스트 메서드 =========================
 
-        log.info("갤럭시 S25 상품이 생성되었습니다: ID={}, 이름={}, 가격={}", 
-                savedProduct.getId(), savedProduct.getName(), savedProduct.getPrice());
+    @Test
+    @DisplayName("갤럭시 S25 생성")
+    @Transactional
+    @Rollback(false)
+    void createGalaxyS25() {
+        createDummyProduct(
+                "갤럭시 S25",
+                "삼성 갤럭시 S25 최신 스마트폰입니다. 강력한 성능과 뛰어난 카메라 기능을 제공합니다.",
+                new BigDecimal("1299000"),
+                100,
+                ProductCategory.ELECTRONICS,
+                true,
+                "갤럭시s25.png"
+        );
+    }
 
-        // then - 검증
-        assertTrue(productRepository.existsById(savedProduct.getId()));
-        
-        Product foundProduct = productRepository.findById(savedProduct.getId()).get();
-        assertEquals("갤럭시 S25", foundProduct.getName());
-        assertEquals(0, new BigDecimal("1299000").compareTo(foundProduct.getPrice()));
-        assertEquals(Integer.valueOf(100), foundProduct.getStockQuantity());
-        assertEquals(ProductCategory.ELECTRONICS, foundProduct.getCategory());
-        assertTrue(foundProduct.getIsActive());
-        assertNotNull(foundProduct.getCreatedAt());
-        assertNotNull(foundProduct.getUpdatedAt());
-
-        // 이미지 검증 (원본 + 썸네일 = 2개)
-        assertEquals(2, foundProduct.getImages().size());
-        
-        // 메인 이미지 검증
-        ProductImage mainImage = foundProduct.getMainImage();
-        assertNotNull(mainImage);
-        assertEquals(originalFileName, mainImage.getOriginalFileName());
-        assertTrue(mainImage.getIsMainImage());
-        assertFalse(mainImage.getIsThumbnail());
-        assertEquals(webPath, mainImage.getFilePath());
-        assertEquals(savedFileName, mainImage.getFileName());
-        assertEquals(uuid, mainImage.getUuid());
-
-        // 썸네일 이미지 검증
-        ProductImage thumbnailImg = foundProduct.getImages().stream()
-                .filter(ProductImage::getIsThumbnail)
-                .findFirst()
-                .orElse(null);
-        assertNotNull(thumbnailImg);
-        assertEquals("s_" + originalFileName, thumbnailImg.getOriginalFileName());
-        assertFalse(thumbnailImg.getIsMainImage());
-        assertTrue(thumbnailImg.getIsThumbnail());
-        assertEquals(thumbnailWebPath, thumbnailImg.getFilePath());
-        assertEquals("s_" + savedFileName, thumbnailImg.getFileName());
-        assertEquals(uuid, thumbnailImg.getUuid());
-
-        log.info("갤럭시 S25 상품 생성 테스트 완료");
+    @Test
+    @DisplayName("이펙티브 자바 생성")
+    @Transactional
+    @Rollback(false)
+    void createEffectiveJava() {
+        createDummyProduct(
+                "이펙티브 자바 3/E",
+                "Joshua Bloch 저, 자바 개발자 필독서. 고급 자바 프로그래밍 기법과 모범 사례를 담았습니다.",
+                new BigDecimal("45000"),
+                50,
+                ProductCategory.BOOK,
+                true,
+                "effective_java_front.jpg", "effective_java_back.png"
+        );
     }
 }

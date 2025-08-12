@@ -38,7 +38,7 @@ public class Delivery extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private DeliveryStatus status = DeliveryStatus.PREPARING;
+    private DeliveryStatus status = DeliveryStatus.PENDING;
 
     @Column
     private String trackingNumber;
@@ -81,15 +81,26 @@ public class Delivery extends BaseEntity {
 
     public boolean canUpdateStatus(DeliveryStatus newStatus) {
         switch (this.status) {
+            case PENDING:
+                return newStatus == DeliveryStatus.PREPARING;
             case PREPARING:
                 return newStatus == DeliveryStatus.SHIPPING;
             case SHIPPING:
                 return newStatus == DeliveryStatus.COMPLETED;
             case COMPLETED:
                 return false;
+            case CANCELED:
+                return false;
             default:
                 return false;
         }
+    }
+    
+    public void cancelDelivery() {
+        if (this.status != DeliveryStatus.PENDING) {
+            throw new IllegalStateException("배송 준비 전 상태에서만 취소할 수 있습니다.");
+        }
+        this.status = DeliveryStatus.CANCELED;
     }
 
     public void startShipping(String trackingNumber) {
