@@ -40,7 +40,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse addItemToCart(Long memberId, CartItemRequest request) {
-        log.info("장바구니에 상품 추가: memberId={}, productId={}, quantity={}", 
+        log.info("[CART_ADD] Adding item to cart: memberId={}, productId={}, quantity={}", 
                 memberId, request.getProductId(), request.getQuantity());
 
         Cart cart = getOrCreateCart(memberId);
@@ -75,12 +75,14 @@ public class CartServiceImpl implements CartService {
         }
 
         Cart savedCart = cartRepository.save(cart);
+        log.info("[CART_ADD] Item added to cart successfully: memberId={}, totalItems={}, totalAmount={}", 
+                memberId, savedCart.getItems().size(), savedCart.getTotalQuantity());
         return cartMapper.toCartResponse(savedCart);
     }
 
     @Override
     public CartResponse updateCartItem(Long memberId, Long productId, Integer quantity) {
-        log.info("장바구니 상품 수량 변경: memberId={}, productId={}, quantity={}", 
+        log.info("[CART_UPDATE] Updating cart item quantity: memberId={}, productId={}, newQuantity={}", 
                 memberId, productId, quantity);
 
         Cart cart = getCartByMemberIdOrThrow(memberId);
@@ -97,12 +99,14 @@ public class CartServiceImpl implements CartService {
         cartItem.updateUnitPrice();
 
         Cart savedCart = cartRepository.save(cart);
+        log.info("[CART_UPDATE] Cart item updated successfully: memberId={}, productId={}, quantity={}", 
+                memberId, productId, quantity);
         return cartMapper.toCartResponse(savedCart);
     }
 
     @Override
     public CartResponse removeItemFromCart(Long memberId, Long productId) {
-        log.info("장바구니에서 상품 제거: memberId={}, productId={}", memberId, productId);
+        log.info("[CART_REMOVE] Removing item from cart: memberId={}, productId={}", memberId, productId);
 
         Cart cart = getCartByMemberIdOrThrow(memberId);
         Product product = getProductById(productId);
@@ -114,17 +118,20 @@ public class CartServiceImpl implements CartService {
         cartItemRepository.delete(cartItem);
 
         Cart savedCart = cartRepository.save(cart);
+        log.info("[CART_REMOVE] Item removed from cart successfully: memberId={}, remainingItems={}", 
+                memberId, savedCart.getItems().size());
         return cartMapper.toCartResponse(savedCart);
     }
 
     @Override
     public void clearCart(Long memberId) {
-        log.info("장바구니 전체 비우기: memberId={}", memberId);
+        log.info("[CART_CLEAR] Clearing entire cart: memberId={}", memberId);
 
         Cart cart = getCartByMemberIdOrThrow(memberId);
         cart.clearItems();
         cartItemRepository.deleteByCartId(cart.getId());
         cartRepository.save(cart);
+        log.info("[CART_CLEAR] Cart cleared successfully: memberId={}", memberId);
     }
 
     @Override
@@ -137,7 +144,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse increaseCartItem(Long memberId, Long productId, Integer amount) {
-        log.info("장바구니 상품 수량 증가: memberId={}, productId={}, amount={}", 
+        log.info("[CART_INCREASE] Increasing cart item quantity: memberId={}, productId={}, increaseBy={}", 
                 memberId, productId, amount);
 
         if (amount <= 0) {
@@ -160,12 +167,14 @@ public class CartServiceImpl implements CartService {
         cartItem.updateUnitPrice();
 
         Cart savedCart = cartRepository.save(cart);
+        log.info("[CART_INCREASE] Cart item increased successfully: memberId={}, productId={}, newQuantity={}", 
+                memberId, productId, newQuantity);
         return cartMapper.toCartResponse(savedCart);
     }
 
     @Override
     public CartResponse decreaseCartItem(Long memberId, Long productId, Integer amount) {
-        log.info("장바구니 상품 수량 감소: memberId={}, productId={}, amount={}", 
+        log.info("[CART_DECREASE] Decreasing cart item quantity: memberId={}, productId={}, decreaseBy={}", 
                 memberId, productId, amount);
 
         if (amount <= 0) {
@@ -190,6 +199,13 @@ public class CartServiceImpl implements CartService {
         }
 
         Cart savedCart = cartRepository.save(cart);
+        if (newQuantity <= 0) {
+            log.info("[CART_DECREASE] Item removed due to zero quantity: memberId={}, productId={}", 
+                    memberId, productId);
+        } else {
+            log.info("[CART_DECREASE] Cart item decreased successfully: memberId={}, productId={}, newQuantity={}", 
+                    memberId, productId, newQuantity);
+        }
         return cartMapper.toCartResponse(savedCart);
     }
 

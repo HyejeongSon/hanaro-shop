@@ -32,7 +32,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
-        log.info("Creating product: name={}, category={}", request.getName(), request.getCategory());
+        log.info("[PRODUCT_CREATE] Starting product creation: name={}, category={}, price={}, stockQuantity={}", 
+                request.getName(), request.getCategory(), request.getPrice(), request.getStockQuantity());
         
         Product product = productMapper.toEntity(request);
         Product savedProduct = productRepository.save(product);
@@ -75,7 +76,8 @@ public class ProductServiceImpl implements ProductService {
             savedProduct = productRepository.save(savedProduct);
         }
         
-        log.info("Product created successfully: id={}", savedProduct.getId());
+        log.info("[PRODUCT_CREATE] Product created successfully: id={}, name={}, imageCount={}", 
+                savedProduct.getId(), savedProduct.getName(), savedProduct.getImages().size());
         return productMapper.toResponse(savedProduct);
     }
 
@@ -104,7 +106,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
-        log.info("Updating product: id={}", productId);
+        log.info("[PRODUCT_UPDATE] Starting product update: id={}, name={}, price={}", 
+                productId, request.getName(), request.getPrice());
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -161,13 +164,14 @@ public class ProductServiceImpl implements ProductService {
         }
         
         Product updatedProduct = productRepository.save(product);
-        log.info("Product updated successfully: id={}", updatedProduct.getId());
+        log.info("[PRODUCT_UPDATE] Product updated successfully: id={}, name={}, imageCount={}", 
+                updatedProduct.getId(), updatedProduct.getName(), updatedProduct.getImages().size());
         return productMapper.toResponse(updatedProduct);
     }
 
     @Override
     public ProductResponse updateStockQuantity(Long productId, Integer quantity) {
-        log.info("Updating stock quantity: productId={}, quantity={}", productId, quantity);
+        log.info("[PRODUCT_STOCK] Starting stock quantity update: productId={}, newQuantity={}", productId, quantity);
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -175,14 +179,14 @@ public class ProductServiceImpl implements ProductService {
         product.updateStockQuantity(quantity);
         
         Product updatedProduct = productRepository.save(product);
-        log.info("Stock quantity updated successfully: id={}, newQuantity={}", 
-                updatedProduct.getId(), updatedProduct.getStockQuantity());
+        log.info("[PRODUCT_STOCK] Stock quantity updated successfully: id={}, oldQuantity={}, newQuantity={}", 
+                updatedProduct.getId(), product.getStockQuantity(), updatedProduct.getStockQuantity());
         return productMapper.toResponse(updatedProduct);
     }
 
     @Override
     public void deleteProduct(Long productId) {
-        log.info("Deleting product: id={}", productId);
+        log.info("[PRODUCT_DELETE] Starting product deletion: id={}", productId);
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -199,12 +203,13 @@ public class ProductServiceImpl implements ProductService {
         
         // 2. DB에서 상품(및 연관 이미지) 삭제  
         productRepository.delete(product);
-        log.info("Product deleted successfully: id={}", productId);
+        log.info("[PRODUCT_DELETE] Product deleted successfully: id={}, name={}, imageCount={}", 
+                productId, product.getName(), product.getImages().size());
     }
 
     @Override
     public ProductResponse updateProductStatus(Long productId, Boolean active) {
-        log.info("Updating product status: productId={}, active={}", productId, active);
+        log.info("[PRODUCT_STATUS] Starting product status update: productId={}, newActive={}", productId, active);
         
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -216,7 +221,8 @@ public class ProductServiceImpl implements ProductService {
         }
         
         Product updatedProduct = productRepository.save(product);
-        log.info("Product status updated successfully: id={}, active={}", updatedProduct.getId(), active);
+        log.info("[PRODUCT_STATUS] Product status updated successfully: id={}, oldActive={}, newActive={}", 
+                updatedProduct.getId(), !active, active);
         return productMapper.toResponse(updatedProduct);
     }
 

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 변수 정의 -->
+    <property name="LOG_DIR" value="logs"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- 상품 관리 비즈니스 로그 -->
+    <appender name="BUSINESS_PRODUCT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/business_product.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/business_product.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- 주문 관리 비즈니스 로그 -->
+    <appender name="BUSINESS_ORDER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/business_order.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/business_order.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- 상품 관리 로거 -->
+    <logger name="com.hanaro.shop.service.ProductServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="BUSINESS_PRODUCT_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- 주문 관리 로거 -->
+    <logger name="com.hanaro.shop.service.OrderServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="BUSINESS_ORDER_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- 장바구니 관리 로거 (주문 관련으로 분류) -->
+    <logger name="com.hanaro.shop.service.CartServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="BUSINESS_ORDER_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- 배송 관리 로거 (주문 관련으로 분류) -->
+    <logger name="com.hanaro.shop.service.DeliveryServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="BUSINESS_ORDER_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- 스케줄러 로거 (주문 관련으로 분류 - 배송 스케줄러) -->
+    <logger name="com.hanaro.shop.service.SchedulerServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="BUSINESS_ORDER_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- 배치 로거 (주문 관련으로 분류 - 매출 통계) -->
+    <logger name="com.hanaro.shop.service.BatchServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="BUSINESS_ORDER_FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    
+    <!-- 루트 로거 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

@@ -21,35 +21,46 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     @Scheduled(cron = "0 */5 * * * *") // 5분마다 실행
     public void updateDeliveryStatusToPreparing() {
+        log.info("[DELIVERY_SCHEDULER] Starting PENDING to PREPARING status update");
         int updatedCount = deliveryRepository.updateAllPendingToPreparing();
         
         if (updatedCount > 0) {
-            log.info("배송 상태 업데이트 완료: {} 건의 배송을 PREPARING 상태로 변경", updatedCount);
+            log.info("[DELIVERY_SCHEDULER] Delivery status updated: {} deliveries changed to PREPARING", updatedCount);
+        } else {
+            log.info("[DELIVERY_SCHEDULER] No deliveries to update to PREPARING status");
         }
     }
 
     @Override
     @Scheduled(cron = "0 */15 * * * *") // 15분마다 실행
     public void updateDeliveryStatusToShipping() {
+        log.info("[DELIVERY_SCHEDULER] Starting PREPARING to SHIPPING status update");
         LocalDateTime shippedAt = LocalDateTime.now();
         String trackingNumber = generateTrackingNumber();
         
         int updatedCount = deliveryRepository.updateAllPreparingToShipping(shippedAt, trackingNumber);
         
         if (updatedCount > 0) {
-            log.info("배송 상태 업데이트 완료: {} 건의 배송을 SHIPPING 상태로 변경", updatedCount);
+            log.info("[DELIVERY_SCHEDULER] Delivery status updated: {} deliveries changed to SHIPPING with tracking: {}", 
+                    updatedCount, trackingNumber);
+        } else {
+            log.info("[DELIVERY_SCHEDULER] No deliveries to update to SHIPPING status");
         }
     }
 
     @Override
     @Scheduled(cron = "0 0 * * * *") // 1시간마다 실행
     public void updateDeliveryStatusToCompleted() {
+        log.info("[DELIVERY_SCHEDULER] Starting SHIPPING to COMPLETED status update");
         LocalDateTime deliveredAt = LocalDateTime.now();
         
         int updatedCount = deliveryRepository.updateAllShippingToCompleted(deliveredAt);
         
         if (updatedCount > 0) {
-            log.info("배송 상태 업데이트 완료: {} 건의 배송을 COMPLETED 상태로 변경", updatedCount);
+            log.info("[DELIVERY_SCHEDULER] Delivery status updated: {} deliveries changed to COMPLETED at {}", 
+                    updatedCount, deliveredAt);
+        } else {
+            log.info("[DELIVERY_SCHEDULER] No deliveries to update to COMPLETED status");
         }
     }
 

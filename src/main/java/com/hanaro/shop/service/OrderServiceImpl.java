@@ -41,7 +41,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponse createOrderFromCart(String memberEmail, OrderCreateRequest request) {
-        log.info("선택 장바구니 주문 생성 시작: {}, 선택된 아이템: {}", memberEmail, request.getCartItemIds());
+        log.info("[ORDER_CREATE] Starting order creation from cart: memberEmail={}, cartItemCount={}, address={}", 
+                memberEmail, request.getCartItemIds().size(), request.getDeliveryAddress());
         
         Member member = memberRepository.findByEmail(memberEmail)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
@@ -114,14 +115,15 @@ public class OrderServiceImpl implements OrderService {
             cartItemRepository.deleteById(cartItem.getId());
         }
         
-        log.info("선택 장바구니 주문 생성 완료: 주문번호={}, 총액={}", 
-                savedOrder.getOrderNumber(), savedOrder.getTotalAmount());
+        log.info("[ORDER_CREATE] Order created successfully: orderNumber={}, totalAmount={}, itemCount={}, deliveryAddress={}", 
+                savedOrder.getOrderNumber(), savedOrder.getTotalAmount(), savedOrder.getOrderItems().size(), savedOrder.getDeliveryAddress());
         
         return orderMapper.toOrderResponseForUser(savedOrder);
     }
 
     @Override
     public OrderResponse getOrderByUser(String memberEmail, Long orderId) {
+        log.info("[ORDER_VIEW] User viewing order: memberEmail={}, orderId={}", memberEmail, orderId);
         Member member = memberRepository.findByEmail(memberEmail)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         
@@ -138,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderResponse> getOrdersByUser(String memberEmail, int page, int size) {
+        log.info("[ORDER_LIST] User viewing order list: memberEmail={}, page={}, size={}", memberEmail, page, size);
         Member member = memberRepository.findByEmail(memberEmail)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         
@@ -172,6 +175,8 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public Page<OrderResponse> searchOrders(OrderSearchRequest request) {
+        log.info("[ORDER_ADMIN_SEARCH] Admin searching orders: orderNumber={}, memberEmail={}, status={}, page={}", 
+                request.getOrderNumber(), request.getMemberEmail(), request.getStatus(), request.getPage());
         Pageable pageable = PageRequest.of(
                 request.getPage(), 
                 request.getSize(),
@@ -201,7 +206,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponse cancelOrder(String memberEmail, Long orderId) {
-        log.info("주문 취소 요청: 사용자={}, 주문ID={}", memberEmail, orderId);
+        log.info("[ORDER_CANCEL] Starting order cancellation by user: memberEmail={}, orderId={}", memberEmail, orderId);
         
         Member member = memberRepository.findByEmail(memberEmail)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
@@ -216,7 +221,8 @@ public class OrderServiceImpl implements OrderService {
 
         Order canceledOrder = cancelOrderInternal(order);
         
-        log.info("주문 취소 완료: 주문번호={}", canceledOrder.getOrderNumber());
+        log.info("[ORDER_CANCEL] Order cancelled successfully by user: orderNumber={}, totalAmount={}", 
+                canceledOrder.getOrderNumber(), canceledOrder.getTotalAmount());
         return orderMapper.toOrderResponseForUser(canceledOrder);
     }
 
@@ -226,14 +232,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponse cancelOrderByAdmin(Long orderId) {
-        log.info("관리자 주문 취소 요청: 주문ID={}", orderId);
+        log.info("[ORDER_ADMIN_CANCEL] Starting order cancellation by admin: orderId={}", orderId);
         
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         Order canceledOrder = cancelOrderInternal(order);
         
-        log.info("관리자 주문 취소 완료: 주문번호={}", canceledOrder.getOrderNumber());
+        log.info("[ORDER_ADMIN_CANCEL] Order cancelled successfully by admin: orderNumber={}, totalAmount={}", 
+                canceledOrder.getOrderNumber(), canceledOrder.getTotalAmount());
         return orderMapper.toOrderResponse(canceledOrder);
     }
 
@@ -242,6 +249,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public OrderSummaryResponse getOrderSummary() {
+        log.info("[ORDER_SUMMARY] Admin requesting order summary statistics");
         List<Order> allOrders = orderRepository.findAll();
         
         // 전체 주문 통계 (유효 주문만)
