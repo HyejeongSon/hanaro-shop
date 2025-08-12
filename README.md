@@ -1,8 +1,8 @@
 # 쇼핑몰서비스
 
-**과정명** [하나은행] Digital hana 路 금융서비스개발 6기
+**과정명** [하나은행] Digital hana 路 금융서비스개발 6기 쇼핑몰 서비스
 
-**제출 기한** 8월 12일(화) 23:59
+**진행 기간** 8월 7일(목) ~ 8월 12일(화)
 
 ## 🛒 쇼핑몰 서비스 – 요구사항
 
@@ -23,20 +23,6 @@
 5. 주문 생성 (장바구니 기반)
 6. 내 주문 내역 확인
 
-### 공통 기능
-
-1. **Validation**
-    - 회원가입(이메일, 비밀번호, 닉네임)과 상품 등록(이름, 가격, 재고 등)시 JSR-303 기반 유효성 검사를 적용
-    - 서버측 예외 발생 시, 공통 에러 메시지 형식으로 클라이언트에 전달
-2. **Exception 처리**
-    - 공통 예외 메시지 구조 설계 및 적용
-3. **Batch & Scheduler**
-    - 매출 통계 등 정기 작업 자동 처리
-4. **DB 및 테스트 코드**
-    - 개발 단계에서 수집된 데이터(DB 테이블의 내용)를 외부 파일로 export (’resources/data/data.sql’)
-    - 테스트 코드 기반으로 DB 초기 데이터(’data.sql’) 삽입 및 마이그레이션 정상 수행 여부 확인
-5. **성능 모니터링/상태 점검용 actuator**
-
 ## ⚙️ 쇼핑몰 서비스 – 기능 명세
 
 | 기능 | 내용 |
@@ -50,55 +36,134 @@
 | Validation | - 회원가입, 상품 등록 시 모든 입력 필드에 유효성 검사 적용 |
 | Actuator | - 시스템 헬스(`health`), 빈(`bean`) 정보, 환경(`env`) 정보, 메트릭(`metric`) 정보 확인용 엔드포인트 제공 |
 
+---
 
-## 🛠️ 쇼핑몰 서비스 – 프로젝트 설정 및 제출물
+## 초기 데이터 설정
 
-### 기본 설정 및 프로젝트 구조
+### data.sql을 이용한 환경 구성
 
-- Spring Boot + Gradle 기반 프로젝트 (JDK21)
-- `application.yml` 또는 `application.properties` 환경 분리
-- DBMS는 **MySQL**
-- README.md 예시
+**설정 방법**
 
-    ```
-    ## 배치 작업 결과 확인
-    - 매일 00시에 실행 → logs/business_*.log에 기록됨
-    - 매출 통계 → DB 테이블 `daily_sales_stats` 확인
-    ```
+1. `application.yml`에서 `spring.sql.init.mode: always`로 변경
+2. 애플리케이션 실행 시 `resources/data/data.sql` 자동 실행
 
+**포함된 테스트 데이터**
 
-### 제출 항목
+- **회원**: 관리자 1명(`hanaro/12345678`), 일반사용자 15명
+- **상품**: 3개 상품 (갤럭시S25, 이펙티브자바, 고구마) + 이미지 8개
+- **주문**: 4건 주문 (3건 완료, 1건 취소)
+- **배송**: 4건 배송 정보 (3건 완료, 1건 취소)
+- **통계**: 2025-08-11 매출 통계 (총매출 278만원, 평균주문 69만원)
 
-1. 프로젝트명은 **`hanaro`**
-2. `.gradle`, `.idea`, `build`, `.gitignore`는 압축 대상에서 제외
-    - 배치작업, 스케줄러, actuator, 로그 기록 등 확인 방법은 README.md에 문서화
-    - 평가에 필요한 모든 파일은 압축에 포함 (예: `/logs/business-2025-07-25.log`, `/resources/static/origin/*.*` 등)
-    - 파일 이름은 본인 이름의 영문이니셜.zip
-3. **기능별 API 명세 (Swagger)**
-    - `http://localhost:8080/swagger-ui/index.html` 로 접속
-4. **설계된 모든 테이블의 샘플 데이터**
-    - 스키마: `hanarodb`, account: `hanaro`, password: `12345678`
-    - ERD 이미지 또는 `.mwb`로 제출
-5. **로그 파일 출력 결과**
-    - 기능 명세에서 정해진 위치
-6. **파일 업로드에 사용된 파일**
-    - 기능 명세에서 정해진 위치
+**매출 현황 (2025-08-11)**
 
-## 📊 쇼핑몰 서비스 - 평가 항목 및 기준
+- 총 매출: 2,780,600원 (유효주문 3건)
+- 인기 상품: 갤럭시S25(1,299,000원), 이펙티브자바(90,000원), 고구마(47,600원)
 
-문서에 명시된 요구사항, 기능 명세, 프로젝트 설정, 제출 항목을 정확히 준수하지 않을 경우 감점
+## Swagger API 문서 구조
 
-| 기능 | 평가 기준 | 배점 |
-| --- | --- | --- |
-| 인증/인가 | • JWT 발급 및 검증<br/>• ADMIN / USER 구분<br/>• ROLE 기반 API 접근 제한 | 10 |
-| 파일 업로드 | • 날짜별 경로 저장 (/resources/static/upload/yyyy/MM/dd)<br/>• 파일명 중복 방지<br/>• 파일 크기 제한 (512KB, 총 3MB) | 5 |
-| 스케줄링 | • 5분 주기: 결제 완료 → 배송 준비<br/>• 15분 주기: 배송 준비 → 배송 중<br/>• 1시간 주기: 배송 중 → 배송 완료<br/>• DB 반영 확인 가능 | 10 |
-| 배치 Job | • 자정마다 통계 실행<br/>• 일자별 주문 수, 매출액, 상품별 통계 생성<br/>• 별도 테이블 저장 | 15 |
-| 로깅 | • 콘솔 로그, business_*.log, rolling log 분리<br/>• 로그 파일 보관 디렉토리 구성 | 10 |
-| 기본 기능 구현 | • 관리자 및 사용자 필수 기능 전체 구현 여부<br/>• 필수 기능 목록: 상품 등록/조회/수정/삭제, 회원가입, 로그인, 장바구니, 주문 등 | 15 |
-| Swagger (OpenAPI 3) | • 사용자/관리자 API 구분<br/>• Swagger UI로 모든 API 테스트 가능<br/>• 명세 명확 | 10 |
-| Validation | • 회원가입, 상품 등록 시 @Valid/@Validated 적용<br/>• 필드별 메시지 반환 확인 | 5 |
-| Actuator | • 기능 명세에서 요구한 모든 엔드포인트(/health, /metrics 등) 확인 가능 | 5 |
-| 코드 품질 및 구조화 | • Controller / Service / Repository 분리<br/>• 중복 코드 최소화<br/>• 명확한 네이밍과 로직 정리 | 10 |
-| 예외 처리 및 에러 | • 공통 예외 처리 (@ControllerAdvice, @ExceptionHandler) 구현<br/>• Swagger를 통해 예외 응답(4xx / 5xx)의 형식 및 메시지 구조를 문서화 및 확인 가능<br/>• 커스텀 예외 메시지 및 에러 코드 반환 | 5 |
+### API 그룹 분리
 
+**1. 관리자 API (`Admin API`)**
+
+- **경로**: `/api/admin/**`
+- **SignIn - 관리자 로그인**: `POST /api/admin/auth/signin` ⚠️ **관리자 계정: `hanaro/12345678`**
+- **Admin - 상품 관리**: 상품 CRUD, 재고 관리, 상태 변경
+- **Admin - 주문 관리**: 전체 주문 조회, 검색, 통계, 관리자 취소
+- **Admin - 회원 관리**: 회원 목록, 삭제, 검색
+- **Admin - 통계 조회**: 일별/상품별 매출 통계
+
+**2. 사용자 API (`User API`)**
+
+- **경로**: `/api/cart/**`, `/api/orders/**`
+- **Cart - 장바구니**: CRUD, 수량 증감, 전체 비우기
+- **Order - 주문 관리**: 장바구니 기반 주문, 내 주문 조회/취소
+- **Delivery - 배송 조회**: 주문별 배송 정보
+
+**3. 공통 API (`Public API`)**
+
+- **경로**: `/api/auth/**`, `/api/members/**`, `/api/products/**`
+- **Authentication**: 회원가입, 로그인, 토큰 관리
+- **Member - 회원 정보**: 프로필 조회/수정, 비밀번호 변경
+- **Product - 상품 조회**: 상품 목록, 상세, 카테고리별, 검색
+
+### ⚠️ 관리자 로그인 주의사항
+**관리자 계정 로그인은 반드시 `SignIn - 관리자 로그인` 그룹에서 진행**
+- **URL**: `POST /api/admin/auth/signin`
+- **계정**: `hanaro` / `12345678`
+- **특징**: 이메일 validation 미적용 (관리자용 특별 계정)
+
+---
+
+### 배치작업 및 스케줄러 동작 확인 : 실시간 로그 모니터링을 통한 검증
+
+**2025-08-11 23:31분~39분 사이에 실제 주문 데이터를 생성**하여 배치작업과 스케줄러의 정상 동작을 확인
+
+#### 📅 테스트 시나리오
+- **주문 생성 시점**: 2025-08-11 23:31분~39분
+- **관찰 포인트**: 23:40분, 23:45분, 자정(00:00:10) 이후
+- **확인 대상**: 배송 상태 자동 변경, 매출 통계 자동 생성
+
+#### 스케줄러 동작 시점
+
+1. 매 5분마다 실행 (PENDING → PREPARING)
+
+   ```java
+   @Scheduled(cron = "0 */5 * * * *") // 5분마다 실행
+   public void updateDeliveryStatusToPreparing() { }
+   ```
+
+2. 매 15분마다 실행 (PREPARING → SHIPPING)
+
+   ```java
+   @Scheduled(cron = "0 */15 * * * *") // 15분마다 실행
+   public void updateDeliveryStatusToShipping() { }
+   ```
+
+3. 매 1시간마다 실행 (SHIPPING → COMPLETED)
+
+   ```java
+   @Scheduled(cron = "0 0 * * * *") // 1시간마다 실행
+   public void updateDeliveryStatusToCompleted() { }
+   ```
+
+#### 배치 작업 시점 (매일 자정 00:00:10)
+
+- 매출 통계 자동 생성
+
+   ```java
+   @Scheduled(cron = "10 0 0 * * *") // 매일 자정에 실행
+   public void generateDailySalesStatistics() { }
+   ```
+
+#### 로그 확인
+
+- 로그 파일 위치
+
+  - 배송/주문 스케줄러: `logs/business_order.log`
+  - 상품 관리: `logs/business_product.log`
+  - 과거 로그: `logs/business_*.yyyy-MM-dd.log` (30일 보관)
+
+- 배송 스케줄러 로그
+
+   ```
+   [DELIVERY_SCHEDULER] PENDING to PREPARING: 2 deliveries updated
+   [DELIVERY_SCHEDULER] PREPARING to SHIPPING: 3 deliveries updated, tracking numbers assigned
+   [DELIVERY_SCHEDULER] SHIPPING to COMPLETED: 1 deliveries updated at 2025-08-12T00:00:08
+   ```
+
+- 매출 통계 배치 로그
+
+   ```
+   [BATCH_STATISTICS] Starting daily sales statistics generation for date: 2025-08-11
+   [BATCH_STATISTICS] Daily sales statistics generated successfully: totalSales=2780600, totalOrders=4
+   [BATCH_STATISTICS] Daily product statistics generated successfully: 3 products processed
+   ```
+
+### 🖥️ Actuator를 통한 시스템 상태 확인
+
+- `http://localhost:8080/management/health` - 애플리케이션 상태 정보
+- `http://localhost:8080/management/metrics` - 메트릭 정보
+- `http://localhost:8080/management/env` - 환경 변수
+- `http://localhost:8080/management/loggers` - 로그 레벨
+- `http://localhost:8080/management/beans` - 스프링 애플리케이션 컨텍스트의 빈
