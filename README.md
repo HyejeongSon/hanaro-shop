@@ -1,4 +1,4 @@
-# 쇼핑몰서비스
+# 쇼핑몰 서비스
 
 **과정명** [하나은행] Digital hana 路 금융서비스개발 6기 쇼핑몰 서비스
 
@@ -36,7 +36,7 @@
 | Validation | - 회원가입, 상품 등록 시 모든 입력 필드에 유효성 검사 적용 |
 | Actuator | - 시스템 헬스(`health`), 빈(`bean`) 정보, 환경(`env`) 정보, 메트릭(`metric`) 정보 확인용 엔드포인트 제공 |
 
----
+
 
 ## 초기 데이터 설정
 
@@ -68,17 +68,16 @@
 
 - **경로**: `/api/admin/**`
 - **SignIn - 관리자 로그인**: `POST /api/admin/auth/signin` ⚠️ **관리자 계정: `hanaro/12345678`**
+- **Admin - 회원 관리**: 회원 목록, 삭제, 검색
 - **Admin - 상품 관리**: 상품 CRUD, 재고 관리, 상태 변경
 - **Admin - 주문 관리**: 전체 주문 조회, 검색, 통계, 관리자 취소
-- **Admin - 회원 관리**: 회원 목록, 삭제, 검색
-- **Admin - 통계 조회**: 일별/상품별 매출 통계
+- **Order Statistics - 주문 통계 관리**: 일별/상품별 매출 통계
 
 **2. 사용자 API (`User API`)**
 
 - **경로**: `/api/cart/**`, `/api/orders/**`
 - **Cart - 장바구니**: CRUD, 수량 증감, 전체 비우기
 - **Order - 주문 관리**: 장바구니 기반 주문, 내 주문 조회/취소
-- **Delivery - 배송 조회**: 주문별 배송 정보
 
 **3. 공통 API (`Public API`)**
 
@@ -87,13 +86,57 @@
 - **Member - 회원 정보**: 프로필 조회/수정, 비밀번호 변경
 - **Product - 상품 조회**: 상품 목록, 상세, 카테고리별, 검색
 
+## 🔐 Swagger API 인증 사용법
+
+### 1. 회원가입 및 로그인
+
+- **일반 사용자**: `POST /api/auth/signup` → `POST /api/auth/signin`
+- **관리자**: 직접 `POST /api/admin/auth/signin` (계정: `hanaro/12345678`)
+
+### 2. JWT 토큰 설정 방법
+
+1. 로그인 API 호출하여 `accessToken` 획득
+2. Swagger UI 상단의 🔒 **Authorize** 버튼 클릭
+3. Value 입력란에 **accessToken 값만 입력** (Bearer 접두사 불필요)
+4. **Authorize** 버튼 클릭하여 인증 완료
+
+### 3. API 권한별 분류
+
+#### 인증 불필요 (Public)
+
+- **회원가입/로그인**: `/api/auth/**`, `/api/admin/auth/signin`
+- **시스템 정보**: `/management/**` (Actuator), `/swagger-ui/**`
+
+#### 인증 필요 (토큰만 있으면 됨)
+
+- **상품 조회**: `/api/products/**` - 목록, 상세, 검색, 카테고리별 (USER/ADMIN 둘 다 접근 가능)
+- **개인정보**: `/api/members/**` - 프로필 조회/수정, 비밀번호 변경
+
+#### USER 권한 필요
+
+- **장바구니**: `/api/cart/**` - 조회, 추가, 수정, 삭제, 증감
+- **주문 관리**: `/api/orders/**` - 주문 생성, 조회, 취소
+- **배송 조회**: `/api/deliveries/**` - 내 주문의 배송 상태 확인
+
+#### ADMIN 권한 필요
+
+- **회원 관리**: `/api/admin/members/**` - 전체 회원 조회, 삭제, 검색
+- **상품 관리**: `/api/admin/products/**` - 상품 CRUD, 재고 관리, 상태 변경
+- **주문 관리**: `/api/admin/orders/**` - 전체 주문 조회, 검색, 통계, 관리자 취소
+- **매출 통계**: `/api/admin/statistics/**` - 일별/상품별 매출 통계 조회
+
+### 4. 토큰 관리
+
+- **토큰 갱신**: `POST /api/auth/refresh` (refreshToken 사용)
+- **로그아웃**: `POST /api/auth/signout` (refreshToken 무효화)
+
 ### ⚠️ 관리자 로그인 주의사항
+
 **관리자 계정 로그인은 반드시 `SignIn - 관리자 로그인` 그룹에서 진행**
+
 - **URL**: `POST /api/admin/auth/signin`
 - **계정**: `hanaro` / `12345678`
 - **특징**: 이메일 validation 미적용 (관리자용 특별 계정)
-
----
 
 ### 배치작업 및 스케줄러 동작 확인 : 실시간 로그 모니터링을 통한 검증
 
