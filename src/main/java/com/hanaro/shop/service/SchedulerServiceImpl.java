@@ -18,43 +18,38 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private final DeliveryRepository deliveryRepository;
 
-    // @Scheduled(fixedRate = 60000) 1 -> 1 -> 5 or 5 -> 5 -> 10
     @Override
-    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    @Scheduled(cron = "0 */5 * * * *") // 5분마다 실행
     public void updateDeliveryStatusToPreparing() {
-        LocalDateTime exactTime = LocalDateTime.now().minusMinutes(5);
-        
-        int updatedCount = deliveryRepository.updateStatusToPreparing(exactTime);
+        int updatedCount = deliveryRepository.updateAllPendingToPreparing();
         
         if (updatedCount > 0) {
-            log.info("배송 상태 업데이트 완료: {} 건의 배송을 PREPARING 상태로 변경 (5분 후)", updatedCount);
+            log.info("배송 상태 업데이트 완료: {} 건의 배송을 PREPARING 상태로 변경", updatedCount);
         }
     }
 
     @Override
-    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    @Scheduled(cron = "0 */15 * * * *") // 15분마다 실행
     public void updateDeliveryStatusToShipping() {
-        LocalDateTime exactTime = LocalDateTime.now().minusMinutes(15);
         LocalDateTime shippedAt = LocalDateTime.now();
         String trackingNumber = generateTrackingNumber();
         
-        int updatedCount = deliveryRepository.updateStatusToShipping(exactTime, shippedAt, trackingNumber);
+        int updatedCount = deliveryRepository.updateAllPreparingToShipping(shippedAt, trackingNumber);
         
         if (updatedCount > 0) {
-            log.info("배송 상태 업데이트 완료: {} 건의 배송을 SHIPPING 상태로 변경 (15분 후)", updatedCount);
+            log.info("배송 상태 업데이트 완료: {} 건의 배송을 SHIPPING 상태로 변경", updatedCount);
         }
     }
 
     @Override
-    @Scheduled(fixedRate = 300000) // 5분마다 실행 (1시간은 좀 더 여유있게)
+    @Scheduled(cron = "0 0 * * * *") // 1시간마다 실행
     public void updateDeliveryStatusToCompleted() {
-        LocalDateTime exactTime = LocalDateTime.now().minusHours(1);
         LocalDateTime deliveredAt = LocalDateTime.now();
         
-        int updatedCount = deliveryRepository.updateStatusToCompleted(exactTime, deliveredAt);
+        int updatedCount = deliveryRepository.updateAllShippingToCompleted(deliveredAt);
         
         if (updatedCount > 0) {
-            log.info("배송 상태 업데이트 완료: {} 건의 배송을 COMPLETED 상태로 변경 (1시간 후)", updatedCount);
+            log.info("배송 상태 업데이트 완료: {} 건의 배송을 COMPLETED 상태로 변경", updatedCount);
         }
     }
 
